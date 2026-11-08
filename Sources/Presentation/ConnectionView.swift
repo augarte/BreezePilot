@@ -44,7 +44,7 @@ struct ConnectionView: View {
                 connectionSection
 
                 Section("Connection Help") {
-                    Text("Connect your iPhone to the same home network as the AC. Allow Local Network access when iOS asks.")
+                    Text("Use the same home network as the AC and allow Local Network access. Guest Wi-Fi may block devices from reaching each other.")
                     Button("Open iPhone Settings", systemImage: "arrow.up.right.square") {
                         if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
                     }
@@ -114,7 +114,11 @@ struct ConnectionView: View {
                 }
             }
 
-            if viewModel.duplicate {
+            if viewModel.address == nil && !viewModel.draft.address.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                Text("Enter a local IPv4 address, such as 192.168.0.20.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            } else if viewModel.duplicate {
                 Text("An AC with this address is already saved.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
@@ -139,9 +143,9 @@ struct ConnectionView: View {
             Text("Connection")
         } footer: {
             if viewModel.manufacturer == .xiaomi {
-                Text("Use the AC’s private IP and 32-character device token. Check the connection before saving. First setup uses internet access to look up the model.")
+                Text("Use the AC’s local IPv4 address and 32-character device token. Check the connection before saving. First setup uses internet access to look up the model.")
             } else {
-                Text("Use the AC’s private IPv4 address from your router’s connected devices list.")
+                Text("Use the AC’s local IPv4 address from your router’s connected devices list.")
             }
         }
     }

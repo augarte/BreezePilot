@@ -163,7 +163,7 @@ struct DaikinClient: ACDevice {
     }
 
     private func exchange(_ commands: [Command]) async throws -> [Reply] {
-        // LocalAddress accepts canonical private IPv4 addresses only.
+        // LocalAddress accepts canonical private and link-local IPv4 addresses.
         let url = URL(string: "http://\(address.value)/dsiot/multireq")!
         let body = try JSONEncoder().encode(Envelope(requests: commands))
         let data = try await requests.post(to: url, body: body)

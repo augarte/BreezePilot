@@ -64,6 +64,7 @@ final class ACLibrary {
             }
             persist()
         }
+        defaults.removeObject(forKey: "acAddress")
     }
 
     func select(_ id: UUID?) {

@@ -15,10 +15,14 @@ The temperature buttons use the AC’s supported range and step. The app waits 7
 
 1. Open `BreezePilot.xcodeproj` in Xcode, select the **BreezePilot** scheme, and choose your iPhone as the destination.
 2. In **Signing & Capabilities**, select your development team if Xcode asks. Run the app.
-3. Tap **Add AC** and choose the brand. Enter the AC’s name and private IPv4 address, and allow Local Network access. For **Xiaomi / Mijia**, enter the 32-character Xiaomi device token. Tap **Check Connection**, then **Save**.
+3. Tap **Add AC** and choose the brand. Enter the AC’s name and local IPv4 address, and allow Local Network access. For **Xiaomi / Mijia**, enter the 32-character Xiaomi device token. Tap **Check Connection**, then **Save**.
 4. With the AC on in Cool mode, tap **+** or **−** to adjust the target.
 
-The app and each AC need to be on the same home network. Xiaomi setup fetches the public specification for the detected model and saves it on the phone. The device token is stored in Keychain.
+The app and each AC need to be on the same home network. BreezePilot accepts private IPv4 addresses and IPv4 link-local addresses for accessories that support them. A dual-stack network works over its IPv4 path. An IPv6-only network requires a separate compatibility check with the actual accessories.
+
+Daikin uses HTTP with transport exceptions scoped to local IPv4 ranges. Xiaomi uses local UDP and fetches public model specifications over HTTPS during setup. BreezePilot saves the specification on the phone and stores the device token in Keychain. See **Settings → Privacy Policy** for details.
+
+Before submitting, test first-run Local Network permission, denial and recovery on a physical iPhone. Verify saved Daikin and Xiaomi control with internet access disabled, and check Xiaomi setup on a DNS64/NAT64 network. Record what the tested hardware supports on IPv6-only Wi-Fi.
 
 ## Open the simulator
 

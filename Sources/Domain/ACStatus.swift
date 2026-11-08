@@ -12,8 +12,8 @@ struct LocalAddress: Equatable, Sendable {
         }
         guard parts.count == 4, octets.count == 4 else { return nil }
 
-        switch (octets[0], octets[1]) {
-        case (10, _), (172, 16...31), (192, 168):
+        switch (octets[0], octets[1], octets[2]) {
+        case (10, _, _), (172, 16...31, _), (192, 168, _), (169, 254, 1...254):
             self.value = value
         default:
             return nil

@@ -30,6 +30,10 @@ struct LibrarySettingsView: View {
                     }
                     Button("Add Room", systemImage: "plus") { editingRoom = ACRoom() }
                 }
+
+                Section("About") {
+                    NavigationLink("Privacy Policy") { PrivacyPolicyView() }
+                }
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)

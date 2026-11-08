@@ -22,6 +22,7 @@ struct ACLibraryTests {
             #expect(unit.roomID == library.defaultRoom?.id)
             #expect(library.selectedUnitID == unit.id)
             #expect(ACLibrary(defaults: defaults, fallbackAddress: nil).selectedUnitID == unit.id)
+            #expect(defaults.object(forKey: "acAddress") == nil)
         }
     }
 
