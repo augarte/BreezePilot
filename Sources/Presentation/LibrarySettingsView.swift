@@ -1,0 +1,106 @@
+import SwiftUI
+
+struct LibrarySettingsView: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var editingRoom: ACRoom?
+    @Bindable var library: ACLibrary
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    Toggle("Reopen Last AC", isOn: $library.restoresScreen)
+                } footer: {
+                    Text("Start where you left off. Turn this off to always open the AC list.")
+                }
+
+                Section("Rooms") {
+                    ForEach(library.rooms) { room in
+                        Button {
+                            editingRoom = room
+                        } label: {
+                            HStack {
+                                Text(room.name).foregroundStyle(.primary)
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.footnote.weight(.semibold))
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                    Button("Add Room", systemImage: "plus") { editingRoom = ACRoom() }
+                }
+            }
+            .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } }
+            }
+            .sheet(item: $editingRoom) { RoomEditor(room: $0, library: library) }
+        }
+    }
+}
+
+private struct RoomEditor: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var name: String
+    @State private var confirmingRemoval = false
+    let room: ACRoom
+    let library: ACLibrary
+
+    init(room: ACRoom, library: ACLibrary) {
+        self.room = room
+        self.library = library
+        _name = State(initialValue: room.name)
+    }
+
+    private var existing: Bool { library.rooms.contains { $0.id == room.id } }
+    private var trimmedName: String { name.trimmingCharacters(in: .whitespacesAndNewlines) }
+    private var duplicate: Bool { library.hasRoom(named: trimmedName, except: room.id) }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    TextField("Room name", text: $name)
+                    if duplicate { Text("A room with this name already exists.").foregroundStyle(.secondary) }
+                }
+                if existing {
+                    Section {
+                        Button("Delete Room", role: .destructive) { confirmingRemoval = true }
+                            .disabled(library.replacementRoom(for: room.id) == nil)
+                    } footer: {
+                        if library.replacementRoom(for: room.id) == nil {
+                            Text("Keep at least one room for your air conditioners.")
+                        }
+                    }
+                }
+            }
+            .navigationTitle(existing ? "Edit Room" : "Add Room")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
+                        var updated = room
+                        updated.name = trimmedName
+                        library.save(updated)
+                        dismiss()
+                    }
+                    .disabled(trimmedName.isEmpty || duplicate)
+                }
+            }
+            .alert("Delete this room?", isPresented: $confirmingRemoval) {
+                Button("Cancel", role: .cancel) {}
+                Button("Delete Room", role: .destructive) {
+                    library.removeRoom(room.id)
+                    dismiss()
+                }
+            } message: {
+                if let replacement = library.replacementRoom(for: room.id) {
+                    Text("ACs in this room will move to \(replacement.name).")
+                }
+            }
+        }
+    }
+}
