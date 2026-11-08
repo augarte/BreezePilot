@@ -7,6 +7,9 @@ struct ApplyACChange: Sendable {
     }
 
     let device: any ACDevice
+    var waitForReadback: @Sendable () async throws -> Void = {
+        try await Task.sleep(for: .milliseconds(500))
+    }
 
     func callAsFunction(_ change: ACChange) async throws -> Result {
         let fresh = try await device.readStatus()
@@ -26,7 +29,7 @@ struct ApplyACChange: Sendable {
 
         var latest: ACStatus?
         for _ in 0..<4 {
-            try await Task.sleep(for: .milliseconds(500))
+            try await waitForReadback()
             guard let status = try? await device.readStatus() else { continue }
             latest = status
             if change.isConfirmed(by: status) { return Result(status: status) }

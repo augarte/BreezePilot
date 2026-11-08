@@ -42,8 +42,10 @@ final class ACLibrary {
         }
     }
 
-    init() {
-        let defaults = UserDefaults.standard
+    init(
+        defaults: UserDefaults = .standard,
+        fallbackAddress: String? = ProcessInfo.processInfo.environment["DAIKIN_ADDRESS"]
+    ) {
         self.defaults = defaults
         if let data = defaults.data(forKey: Self.storageKey),
            let saved = try? JSONDecoder().decode(SavedState.self, from: data) {
@@ -54,8 +56,7 @@ final class ACLibrary {
             repairRoomAssignments()
         } else {
             state = SavedState()
-            let oldAddress = defaults.string(forKey: "acAddress")
-                ?? ProcessInfo.processInfo.environment["DAIKIN_ADDRESS"]
+            let oldAddress = defaults.string(forKey: "acAddress") ?? fallbackAddress
             if let oldAddress, let address = LocalAddress(oldAddress) {
                 let unit = SavedAC(name: "Daikin AC", address: address.value, roomID: defaultRoom?.id)
                 state.units = [unit]

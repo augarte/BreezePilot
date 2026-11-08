@@ -2,7 +2,15 @@ import SwiftUI
 
 @main
 struct BreezePilotApp: App {
-    @State private var library = ACLibrary()
+    @State private var library = {
+        #if DEBUG
+        if ProcessInfo.processInfo.environment["BREEZEPILOT_UNIT_TESTING"] == "1",
+           let defaults = UserDefaults(suiteName: "local.breezepilot.test-host") {
+            return ACLibrary(defaults: defaults, fallbackAddress: nil)
+        }
+        #endif
+        return ACLibrary()
+    }()
     private let devices = ACDevices(
         make: { unit, address in
             if let profile = unit.xiaomi {

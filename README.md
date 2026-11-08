@@ -30,3 +30,7 @@ On Xcode 27, choose **Xcode → Open Developer Tool → Device Hub**. Select the
 - `Application` defines the device interface and the use case that validates, sends, and confirms a change.
 - `Infrastructure` contains the Daikin HTTP and Xiaomi MIoT request providers, model specification lookup, and Keychain storage.
 - `Presentation` contains the screen view models and SwiftUI views, including the room readings shared by the list and detail screens.
+
+## Run unit tests
+
+Open `BreezePilot.xcodeproj`, select the **BreezePilot** scheme and an iPhone simulator, then press **⌘U**. The tests use simulated AC responses and isolated preferences and run without an air conditioner or Wi-Fi.
