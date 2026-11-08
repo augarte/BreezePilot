@@ -22,14 +22,13 @@ struct ACListView: View {
     var body: some View {
         Group {
             if library.units.isEmpty {
-                ContentUnavailableView {
-                    Label("No ACs Yet", systemImage: "snowflake")
-                } description: {
-                    Text("Add an air conditioner using its local IP address.")
-                } actions: {
-                    Button("Add AC", systemImage: "plus") { addingUnit = true }
-                        .buttonStyle(.borderedProminent)
-                }
+                ACEmptyStateView(
+                    artwork: .emptyACList,
+                    title: "No ACs yet",
+                    message: Text("Add an air conditioner using its local IP address."),
+                    primaryAction: .init(title: "Add AC") { addingUnit = true },
+                    primaryIcon: "plus"
+                )
             } else {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 24) {
@@ -45,7 +44,7 @@ struct ACListView: View {
                 .refreshable { await viewModel.refresh(library.units) }
             }
         }
-        .background(Color(uiColor: .systemGroupedBackground))
+        .background(BreezePilotPalette.canvas)
         .navigationTitle("Air Conditioners")
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {

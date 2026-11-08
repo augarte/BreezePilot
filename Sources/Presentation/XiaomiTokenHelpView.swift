@@ -2,6 +2,7 @@ import SwiftUI
 
 struct XiaomiTokenHelpView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     private static let guide = URL(
         string: "https://github.com/PiotrMachowski/Xiaomi-cloud-tokens-extractor#readme"
@@ -11,7 +12,7 @@ struct XiaomiTokenHelpView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("The 32-character device token lets this app talk to your AC over home Wi-Fi.")
+                    introduction
 
                     step(1, "Open the Xiaomi Cloud Tokens Extractor guide and run the tool on your computer.")
                     step(2, "Choose QR sign-in. Use the account and region where the AC appears in Xiaomi Home.")
@@ -37,6 +38,16 @@ struct XiaomiTokenHelpView: View {
                     Button("Done") { dismiss() }
                 }
             }
+        }
+    }
+
+    private var introduction: some View {
+        let layout = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 12))
+            : AnyLayout(HStackLayout(alignment: .center, spacing: 14))
+        return layout {
+            BreezeIllustration(artwork: .xiaomiToken)
+            Text("The 32-character device token lets this app talk to your AC over home Wi-Fi.")
         }
     }
 

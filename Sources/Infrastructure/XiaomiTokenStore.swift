@@ -68,7 +68,7 @@ enum XiaomiError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .missingToken: "Enter the AC’s Xiaomi device token in Edit AC."
-        case .noReply: "The AC didn’t answer over Wi‑Fi. Check its address, device token, and Local Network access."
+        case .noReply: ACDeviceError.unreachable.localizedDescription
         case .authentication: "The AC’s reply couldn’t be verified. Check the device token and address."
         case .incompatible: "This AC didn’t provide a compatible Xiaomi local status."
         case .catalogUnavailable: "Couldn’t load Xiaomi’s public model specifications. Check your internet connection and try again."

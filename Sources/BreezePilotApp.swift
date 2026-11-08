@@ -28,7 +28,7 @@ struct BreezePilotApp: App {
                         }
                     }
             }
-            .tint(Color(red: 0.02, green: 0.42, blue: 0.44))
+            .tint(BreezePilotPalette.accent)
         }
     }
 }

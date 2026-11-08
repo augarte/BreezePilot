@@ -7,9 +7,13 @@ struct ACTemperatureCard: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            Label(isXiaomi ? "Set temperature" : "Cooling target",
-                  systemImage: viewModel.status?.mode == .heat && isXiaomi ? "thermometer.sun" : "snowflake")
-                .font(.headline)
+            Label {
+                Text(isXiaomi ? "Set temperature" : "Cooling target")
+            } icon: {
+                Image(systemName: viewModel.status?.mode == .heat && isXiaomi ? "thermometer.sun" : "snowflake")
+                    .foregroundStyle(BreezePilotPalette.gold)
+            }
+            .font(.headline)
 
             ViewThatFits(in: .horizontal) {
                 HStack(spacing: 8) {
@@ -41,10 +45,7 @@ struct ACTemperatureCard: View {
             RoundedRectangle(cornerRadius: 26)
                 .fill(
                     LinearGradient(
-                        colors: [
-                            Color(red: 0.04, green: 0.34, blue: 0.39),
-                            Color(red: 0.05, green: 0.16, blue: 0.24)
-                        ],
+                        colors: [BreezePilotPalette.action, BreezePilotPalette.navy],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )

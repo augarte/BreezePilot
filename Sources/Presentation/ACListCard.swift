@@ -21,7 +21,7 @@ struct ACListCard: View {
         }
         .padding(18)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 24))
+        .background(BreezePilotPalette.surface, in: RoundedRectangle(cornerRadius: 24))
         .contentShape(RoundedRectangle(cornerRadius: 24))
     }
 
@@ -29,9 +29,9 @@ struct ACListCard: View {
         HStack(spacing: 12) {
             Image(systemName: "snowflake")
                 .font(.title3.weight(.semibold))
-                .foregroundStyle(Color.accentColor)
+                .foregroundStyle(BreezePilotPalette.accent)
                 .frame(width: 46, height: 46)
-                .background(Color.accentColor.opacity(0.11), in: RoundedRectangle(cornerRadius: 14))
+                .background(BreezePilotPalette.ice, in: RoundedRectangle(cornerRadius: 14))
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 5) {
@@ -52,13 +52,13 @@ struct ACListCard: View {
         let active = status?.isOn == true
         return HStack(spacing: 6) {
             Circle()
-                .fill(active ? Color.accentColor : Color.secondary)
+                .fill(active ? BreezePilotPalette.gold : Color.secondary)
                 .frame(width: 6, height: 6)
                 .accessibilityHidden(true)
             Text(stateLabel)
                 .font(.caption.weight(.semibold))
         }
-        .foregroundStyle(active ? Color.accentColor : Color.secondary)
+        .foregroundStyle(active ? BreezePilotPalette.accent : Color.secondary)
     }
 
     private var stateLabel: String {
@@ -114,7 +114,7 @@ private struct ACSettingTile: View {
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.accentColor.opacity(0.07), in: RoundedRectangle(cornerRadius: 14))
+        .background(BreezePilotPalette.ice, in: RoundedRectangle(cornerRadius: 14))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(title), \(value)")
     }

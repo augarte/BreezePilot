@@ -61,7 +61,7 @@ struct ACFanCard: View {
             }
         }
         .padding(18)
-        .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 20))
+        .background(BreezePilotPalette.surface, in: RoundedRectangle(cornerRadius: 20))
     }
 
     private var displayedSpeeds: [FanSpeed] {
@@ -138,7 +138,7 @@ struct ACExtrasCard: View {
                 .foregroundStyle(.primary)
         }
         .padding(18)
-        .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 20))
+        .background(BreezePilotPalette.surface, in: RoundedRectangle(cornerRadius: 20))
     }
 }
 
@@ -155,9 +155,9 @@ private struct ACOptionButton: View {
             Text(title)
                 .font(.subheadline.weight(.semibold))
                 .frame(maxWidth: .infinity, minHeight: 44)
-                .foregroundStyle(selected ? Color.white : Color.accentColor)
+                .foregroundStyle(selected ? Color.white : BreezePilotPalette.accent)
                 .background(
-                    selected ? Color.accentColor : Color.accentColor.opacity(0.10),
+                    selected ? BreezePilotPalette.action : BreezePilotPalette.ice,
                     in: RoundedRectangle(cornerRadius: 12)
                 )
                 .opacity(available ? 1 : 0.45)

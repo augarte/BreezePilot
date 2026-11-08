@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ACConnectionBar: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    let status: ACStatus
     let viewModel: ACControlViewModel
 
     var body: some View {
@@ -10,9 +11,9 @@ struct ACConnectionBar: View {
             : AnyLayout(HStackLayout(spacing: 10))
         return layout {
             HStack(spacing: 10) {
-                Image(systemName: viewModel.status == nil ? "wifi" : "wifi.circle.fill")
+                Image(systemName: "wifi.circle.fill")
                     .font(.title3)
-                    .foregroundStyle(Color.accentColor)
+                    .foregroundStyle(BreezePilotPalette.accent)
                     .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: 3) {
@@ -20,7 +21,7 @@ struct ACConnectionBar: View {
                         .font(.subheadline.weight(.semibold))
                         .accessibilityIdentifier("connectionStatus")
 
-                    if let date = viewModel.updatedAt, viewModel.status != nil {
+                    if let date = viewModel.updatedAt {
                         Text("Updated at \(date.formatted(date: .omitted, time: .shortened))")
                             .font(.caption)
                             .foregroundStyle(.secondary)
@@ -50,21 +51,18 @@ struct ACConnectionBar: View {
     private var connectionTitle: String {
         if viewModel.activity == .writing { return "Applying AC change" }
         if viewModel.activity == .reading { return "Reading AC status" }
-        return viewModel.status == nil ? "AC unavailable" : "Connected to AC"
+        return "Connected to AC"
     }
 
-    @ViewBuilder
     private var powerButton: some View {
-        if let status = viewModel.status {
-            Button(status.isOn ? "Turn Off" : "Turn On", systemImage: "power") {
-                Task { await viewModel.togglePower() }
-            }
-            .labelStyle(.iconOnly)
-            .buttonStyle(.bordered)
-            .fixedSize(horizontal: true, vertical: false)
-            .disabled(viewModel.isUpdating || !status.powerWritable)
-            .accessibilityValue(status.isOn ? "AC is on" : "AC is off")
+        Button(status.isOn ? "Turn Off" : "Turn On", systemImage: "power") {
+            Task { await viewModel.togglePower() }
         }
+        .labelStyle(.iconOnly)
+        .buttonStyle(.bordered)
+        .fixedSize(horizontal: true, vertical: false)
+        .disabled(viewModel.isUpdating || !status.powerWritable)
+        .accessibilityValue(status.isOn ? "AC is on" : "AC is off")
     }
 
 }

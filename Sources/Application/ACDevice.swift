@@ -28,7 +28,7 @@ enum ACDeviceError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .unreachable: "Can’t reach the AC. Check your home Wi‑Fi, the saved address, and Local Network access."
+        case .unreachable: "Connect to the same Wi-Fi network as your AC."
         case .unexpectedResponse: "This address didn’t return a compatible Daikin status."
         case .unconfirmed: "The AC’s response didn’t confirm the change. Refresh before trying again."
         }

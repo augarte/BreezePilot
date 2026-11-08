@@ -10,9 +10,11 @@ final class ACControlViewModel {
     private(set) var activity: Activity?
     private(set) var message: String?
     private(set) var pendingTarget: Int?
+    private var hasCheckedConnection = false
     @ObservationIgnored private var adjustmentTask: Task<Void, Never>?
 
     var isUpdating: Bool { activity != nil || pendingTarget != nil }
+    var isConnecting: Bool { !hasCheckedConnection || activity == .reading }
     var displayedTarget: Int? { pendingTarget ?? status?.target }
 
     enum Activity {
@@ -33,7 +35,10 @@ final class ACControlViewModel {
         guard !isUpdating else { return }
         activity = .reading
         message = nil
-        defer { activity = nil }
+        defer {
+            hasCheckedConnection = true
+            activity = nil
+        }
 
         do {
             receive(try await device.readStatus())
