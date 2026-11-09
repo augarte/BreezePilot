@@ -1,40 +1,71 @@
 # BreezePilot
 
-BreezePilot is a SwiftUI iPhone app for the Daikin FTKM-YV2S and compatible Xiaomi / Mijia air conditioners. It controls saved units directly over home Wi-Fi. After installation and setup, you can use it with the Mac switched off.
+**Your AC, one tap away.** Switch your air conditioner on or off, set the temperature, and adjust the fan right from your iPhone’s Home Screen.
 
-## Screens
+BreezePilot is an open source iPhone remote for compatible Daikin and Xiaomi / Mijia air conditioners. It talks directly to your AC over your home network. Once installed, it runs on your iPhone without a Mac or a BreezePilot account.
 
-- **Air Conditioners** groups saved units by room and shows live mode, target, fan speed, room temperature, and humidity when reported. Use **Add AC** to choose a brand and save a compatible unit. Each card opens that AC’s controls.
-- **Control** puts the power icon beside refresh and shows the unit’s modes, fan speeds, and available room readings. Daikin extras include **Boost**, **Econo**, and **Streamer** where supported. Compatible Xiaomi units can show an **Eco mode** switch. The controls dim when the AC is off.
-- **Edit AC** lets you change a unit’s name, room, or local address, check its connection, or remove it from the app.
-- **Settings** lets you add, rename, or delete rooms and turn **Reopen Last AC** on or off. New ACs default to Living Room. ACs in a deleted room move to Living Room or the first remaining room. Keep at least one room.
+## What you can do
 
-The temperature buttons use the AC’s supported range and step. The app waits 750 ms after the last tap, sends the final target, and reads it back. It also reads back changes to power, operating mode, fan speed, and extras.
+- Save multiple ACs, group them by room, and see their status in one place.
+- Adjust power, temperature, mode, and fan speed. See room temperature and humidity when your unit reports them. Some models also expose Boost, Econo, Streamer, or Eco mode.
+- Use the **Air Conditioners** Home Screen widget to see status and adjust power, temperature, and fan speed. Use its round refresh button to request a new reading.
+- Add **Set AC Power** and **Set AC Temperature** to a shortcut in Apple Shortcuts.
 
-## Install on an iPhone
+## Compatibility
 
-1. Open `BreezePilot.xcodeproj` in Xcode, select the **BreezePilot** scheme, and choose your iPhone as the destination.
-2. In **Signing & Capabilities**, select your development team if Xcode asks. Run the app.
-3. Tap **Add AC** and choose the brand. Enter the AC’s name and local IPv4 address, and allow Local Network access. For **Xiaomi / Mijia**, enter the 32-character Xiaomi device token. Tap **Check Connection**, then **Save**.
-4. With the AC on in Cool mode, tap **+** or **−** to adjust the target.
+| Brand | What you need |
+| --- | --- |
+| Daikin | A unit that supports the local `/dsiot/multireq` interface. BreezePilot was developed with the Daikin FTKM-YV2S. |
+| Xiaomi / Mijia | A compatible MIoT air conditioner and its 32-character hexadecimal device token. Setup fetches the model’s public specification. |
 
-The app and each AC need to be on the same home network. BreezePilot accepts private IPv4 addresses and IPv4 link-local addresses for accessories that support them. A dual-stack network works over its IPv4 path. An IPv6-only network requires a separate compatibility check with the actual accessories.
+BreezePilot targets **iPhone with iOS 17 or later**. Your phone must be able to reach the AC’s local IPv4 address over Wi-Fi. Models and firmware vary in the controls they expose. If you try another model, [share what works](https://github.com/augarte/BreezePilot/issues).
 
-Daikin uses HTTP with transport exceptions scoped to local IPv4 ranges. Xiaomi uses local UDP and fetches public model specifications over HTTPS during setup. BreezePilot saves the specification on the phone and stores the device token in Keychain. See **Settings → Privacy Policy** for details.
+## Install from source
 
-Before submitting, test first-run Local Network permission, denial and recovery on a physical iPhone. Verify saved Daikin and Xiaomi control with internet access disabled, and check Xiaomi setup on a DNS64/NAT64 network. Record what the tested hardware supports on IPv6-only Wi-Fi.
+1. Clone the repository and open `BreezePilot.xcodeproj` in Xcode. The project uses Swift 6 and was verified with Xcode 27.2.
+   ```sh
+   git clone https://github.com/augarte/BreezePilot.git
+   cd BreezePilot
+   open BreezePilot.xcodeproj
+   ```
+2. Create a file called `BreezePilot.local.xcconfig` beside `App.xcconfig`. This file is ignored by Git. Replace the example values with a unique bundle identifier and your Apple development team ID.
+   ```xcconfig
+   BREEZEPILOT_BUNDLE_ID = com.example.breezepilot
+   DEVELOPMENT_TEAM = YOUR_TEAM_ID
+   ```
+3. For widget and Shortcuts access, [register an App Group](https://developer.apple.com/help/account/identifiers/register-an-app-group/) named `group.` followed by your bundle identifier. Assign it to both App IDs, the app identifier and its `.widgets` counterpart. The app and widget must use the same team and group. If you already have a registered group, set `BREEZEPILOT_APP_GROUP` in the same local file.
+4. Choose the **BreezePilot** scheme and your iPhone, then click **Run**. In the app, tap **Add AC**, pick the brand, and enter the local address. For Xiaomi, enter the token and use **Check Connection** before saving. Allow Local Network access when prompted.
 
-## Open the simulator
+To run the in-app controls with a signing setup that does not support App Groups, add `CODE_SIGN_ENTITLEMENTS =` to the local configuration. Home Screen controls and Shortcuts require the shared App Group.
 
-On Xcode 27, choose **Xcode → Open Developer Tool → Device Hub**. Select the **iPhone 18 Pro** simulator and click **View Screen**.
+## Add the Home Screen widget
 
-## Source layout
+Add **Air Conditioners** from the iPhone widget gallery. Touch and hold the widget, choose **Edit Widget**, and select your saved ACs. The layout adapts to your selection.
 
-- `Domain` defines AC state, capabilities, and room readings.
-- `Application` defines the device interface and the use case that validates, sends, and confirms a change.
-- `Infrastructure` contains the Daikin HTTP and Xiaomi MIoT request providers, model specification lookup, and Keychain storage.
-- `Presentation` contains the screen view models and SwiftUI views, including the room readings shared by the list and detail screens.
+| Size | ACs shown |
+| --- | --- |
+| Small | 1 |
+| Medium | 1 or 2 |
+| Large | 1 to 4 |
 
-## Run unit tests
+If an AC shows **Unavailable**, try the round refresh button. If it still fails, check that the phone and AC can reach each other over Wi-Fi and that **Local Network** access is enabled for BreezePilot.
 
-Open `BreezePilot.xcodeproj`, select the **BreezePilot** scheme and an iPhone simulator, then press **⌘U**. The tests use simulated AC responses and isolated preferences and run without an air conditioner or Wi-Fi.
+## Develop and contribute
+
+Use the **BreezePilot** scheme with an iPhone simulator and press **⌘U**. The unit and UI tests use fixtures and run without AC hardware. Open `Widgets/ACWidgetPreviews.swift` in the Xcode Canvas to see supported sizes and states. Verify Home Screen interactions on a physical iPhone when changing widget actions.
+
+| Path | Contents |
+| --- | --- |
+| `Sources/Domain` | AC state, room readings, and capabilities |
+| `Sources/Application` | Device interface, confirmed changes, and App Intents |
+| `Sources/Infrastructure` | Daikin and Xiaomi protocols, model lookup, and Keychain storage |
+| `Sources/Presentation` | SwiftUI screens and view models |
+| `Widgets` | Widget configuration, timeline, views, and previews |
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for reporting issues, adding model support, and opening pull requests.
+
+## Privacy and license
+
+AC control stays on your local network. Xiaomi setup fetches public model information over HTTPS and stores the device token in the iPhone’s Keychain. See [PRIVACY.md](PRIVACY.md) for details and [SECURITY.md](SECURITY.md) for private vulnerability reporting.
+
+BreezePilot is available under the [MIT License](LICENSE). It is an independent project.

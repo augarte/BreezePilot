@@ -5,3 +5,14 @@ DerivedData/
 build/
 .build/
 *.mobileprovision
+*.provisionprofile
+*.p12
+*.pfx
+*.pem
+*.key
+*.ipa
+*.xcarchive/
+*.xcresult/
+.env
+.env.*
+BreezePilot.local.xcconfig
