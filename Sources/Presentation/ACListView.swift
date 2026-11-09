@@ -82,6 +82,7 @@ struct ACListView: View {
                     )
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("acListItem")
             }
         }
     }

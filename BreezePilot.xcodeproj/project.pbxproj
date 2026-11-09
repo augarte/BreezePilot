@@ -18,6 +18,13 @@
 			remoteGlobalIDString = 7DA100000000000000000006;
 			remoteInfo = BreezePilot;
 		};
+		7DA400000000000000000008 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7DA100000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7DA100000000000000000006;
+			remoteInfo = BreezePilot;
+		};
 		7DA30000000000000000000B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 7DA100000000000000000001 /* Project object */;
@@ -46,7 +53,9 @@
 		7DA100000000000000000008 /* BreezePilot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BreezePilot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7DA100000000000000000011 /* App.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = App.xcconfig; sourceTree = SOURCE_ROOT; };
 		7DA200000000000000000003 /* BreezePilotTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BreezePilotTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7DA400000000000000000003 /* BreezePilotUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BreezePilotUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7DA20000000000000000000C /* Tests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Tests.xcconfig; sourceTree = SOURCE_ROOT; };
+		7DA40000000000000000000C /* UITests.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = UITests.xcconfig; sourceTree = SOURCE_ROOT; };
 		7DA300000000000000000003 /* BreezePilotWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BreezePilotWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		7DA30000000000000000000F /* Widget.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Widget.xcconfig; sourceTree = SOURCE_ROOT; };
 		7DA300000000000000000010 /* WidgetInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = WidgetInfo.plist; sourceTree = "<group>"; };
@@ -58,6 +67,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Assets.xcassets,
+				ACUITestFixture.swift,
 				BreezePilotApp.swift,
 				Presentation/ACConnectionBar.swift,
 				Presentation/ACConnectionViewModel.swift,
@@ -83,6 +93,7 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		7DA100000000000000000003 /* Sources */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (7DA30000000000000000000D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Sources; sourceTree = "<group>"; };
 		7DA200000000000000000002 /* Tests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Tests; sourceTree = "<group>"; };
+		7DA400000000000000000002 /* UITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = UITests; sourceTree = "<group>"; };
 		7DA300000000000000000002 /* Widgets */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Widgets; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -95,6 +106,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		7DA200000000000000000005 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7DA400000000000000000005 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -116,6 +134,7 @@
 			children = (
 				7DA100000000000000000003 /* Sources */,
 				7DA200000000000000000002 /* Tests */,
+				7DA400000000000000000002 /* UITests */,
 				7DA100000000000000000005 /* Info.plist */,
 				7DA300000000000000000002 /* Widgets */,
 				7DA300000000000000000010 /* WidgetInfo.plist */,
@@ -123,6 +142,7 @@
 				7DA300000000000000000011 /* BreezePilot.entitlements */,
 				7DA100000000000000000011 /* App.xcconfig */,
 				7DA20000000000000000000C /* Tests.xcconfig */,
+				7DA40000000000000000000C /* UITests.xcconfig */,
 				7DA100000000000000000004 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -132,6 +152,7 @@
 			children = (
 				7DA100000000000000000008 /* BreezePilot.app */,
 				7DA200000000000000000003 /* BreezePilotTests.xctest */,
+				7DA400000000000000000003 /* BreezePilotUITests.xctest */,
 				7DA300000000000000000003 /* BreezePilotWidgets.appex */,
 			);
 			name = Products;
@@ -183,6 +204,27 @@
 			productReference = 7DA200000000000000000003 /* BreezePilotTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		7DA400000000000000000001 /* BreezePilotUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7DA400000000000000000009 /* Build configuration list for PBXNativeTarget "BreezePilotUITests" */;
+			buildPhases = (
+				7DA400000000000000000004 /* Sources */,
+				7DA400000000000000000005 /* Frameworks */,
+				7DA400000000000000000006 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7DA400000000000000000007 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				7DA400000000000000000002 /* UITests */,
+			);
+			name = BreezePilotUITests;
+			productName = BreezePilotUITests;
+			productReference = 7DA400000000000000000003 /* BreezePilotUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		7DA300000000000000000001 /* BreezePilotWidgets */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7DA300000000000000000007 /* Build configuration list for PBXNativeTarget "BreezePilotWidgets" */;
@@ -223,6 +265,9 @@
 					7DA200000000000000000001 = {
 						TestTargetID = 7DA100000000000000000006;
 					};
+					7DA400000000000000000001 = {
+						TestTargetID = 7DA100000000000000000006;
+					};
 					7DA300000000000000000001 = {
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
@@ -248,6 +293,7 @@
 			targets = (
 				7DA100000000000000000006 /* BreezePilot */,
 				7DA200000000000000000001 /* BreezePilotTests */,
+				7DA400000000000000000001 /* BreezePilotUITests */,
 				7DA300000000000000000001 /* BreezePilotWidgets */,
 			);
 		};
@@ -262,6 +308,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		7DA200000000000000000006 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7DA400000000000000000006 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -292,6 +345,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7DA400000000000000000004 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7DA300000000000000000004 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -306,6 +366,11 @@
 			isa = PBXTargetDependency;
 			target = 7DA100000000000000000006 /* BreezePilot */;
 			targetProxy = 7DA200000000000000000008 /* PBXContainerItemProxy */;
+		};
+		7DA400000000000000000007 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7DA100000000000000000006 /* BreezePilot */;
+			targetProxy = 7DA400000000000000000008 /* PBXContainerItemProxy */;
 		};
 		7DA30000000000000000000A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -356,9 +421,23 @@
 			};
 			name = Debug;
 		};
+		7DA40000000000000000000A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7DA40000000000000000000C /* UITests.xcconfig */;
+			buildSettings = {
+			};
+			name = Debug;
+		};
 		7DA20000000000000000000B /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7DA20000000000000000000C /* Tests.xcconfig */;
+			buildSettings = {
+			};
+			name = Release;
+		};
+		7DA40000000000000000000B /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7DA40000000000000000000C /* UITests.xcconfig */;
 			buildSettings = {
 			};
 			name = Release;
@@ -403,6 +482,15 @@
 			buildConfigurations = (
 				7DA20000000000000000000A /* Debug */,
 				7DA20000000000000000000B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7DA400000000000000000009 /* Build configuration list for PBXNativeTarget "BreezePilotUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7DA40000000000000000000A /* Debug */,
+				7DA40000000000000000000B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

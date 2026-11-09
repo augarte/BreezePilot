@@ -8,6 +8,11 @@ struct BreezePilotApp: App {
     init() {
         #if DEBUG
         let environment = ProcessInfo.processInfo.environment
+        if let fixture = ACUITestFixture(rawValue: environment["BREEZEPILOT_UI_TESTING"] ?? "") {
+            _library = State(initialValue: fixture.makeLibrary())
+            devices = fixture.makeDevices()
+            return
+        }
         if environment["BREEZEPILOT_UNIT_TESTING"] == "1",
            let defaults = UserDefaults(suiteName: "local.breezepilot.test-host") {
             _library = State(initialValue: ACLibrary(defaults: defaults, fallbackAddress: nil))

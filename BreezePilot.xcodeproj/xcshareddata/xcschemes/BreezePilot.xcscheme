@@ -12,6 +12,9 @@
          <TestableReference skipped="NO">
             <BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="7DA200000000000000000001" BuildableName="BreezePilotTests.xctest" BlueprintName="BreezePilotTests" ReferencedContainer="container:BreezePilot.xcodeproj"/>
          </TestableReference>
+         <TestableReference skipped="NO">
+            <BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="7DA400000000000000000001" BuildableName="BreezePilotUITests.xctest" BlueprintName="BreezePilotUITests" ReferencedContainer="container:BreezePilot.xcodeproj"/>
+         </TestableReference>
       </Testables>
       <EnvironmentVariables>
          <EnvironmentVariable key="BREEZEPILOT_UNIT_TESTING" value="1" isEnabled="YES"/>

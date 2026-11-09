@@ -16,7 +16,7 @@ enum ACWidgetStore {
     private static let isTesting: Bool = {
         #if DEBUG
         let environment = ProcessInfo.processInfo.environment
-        return environment["BREEZEPILOT_UNIT_TESTING"] == "1"
+        return environment["BREEZEPILOT_UNIT_TESTING"] == "1" || environment["BREEZEPILOT_UI_TESTING"] != nil
         #else
         return false
         #endif
