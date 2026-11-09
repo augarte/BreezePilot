@@ -1,0 +1,315 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1254" height="1254" viewBox="0 0 1254 1254" role="img" aria-labelledby="title description">
+  <title id="title">BreezePilot snowflake with AC remote</title>
+  <desc id="description">A delighted ice-blue snowflake in a leather aviator cap and gold goggles holds a white air-conditioner remote against a blue sky.</desc>
+  <defs>
+    <radialGradient id="sky" cx=".49" cy=".51" r=".65">
+      <stop stop-color="#08d6ff"/>
+      <stop offset=".53" stop-color="#009df3"/>
+      <stop offset=".78" stop-color="#027cee"/>
+      <stop offset="1" stop-color="#0476e3"/>
+    </radialGradient>
+    <radialGradient id="cast">
+      <stop stop-color="#003682" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#0040a0" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ice-arm" x1=".22" y1="0" x2=".8" y2=".88">
+      <stop stop-color="#fff"/>
+      <stop offset=".16" stop-color="#f4fbff"/>
+      <stop offset=".52" stop-color="#d9edfc"/>
+      <stop offset=".77" stop-color="#b5dff8"/>
+      <stop offset="1" stop-color="#71bff3"/>
+    </linearGradient>
+    <linearGradient id="ice-edge" x1=".2" y1="0" x2=".8" y2="1">
+      <stop stop-color="#fff"/>
+      <stop offset=".45" stop-color="#f7fdff"/>
+      <stop offset="1" stop-color="#8acdf8"/>
+    </linearGradient>
+    <radialGradient id="face-color" cx=".48" cy=".38" r=".68">
+      <stop offset=".38" stop-color="#eaf5fd"/>
+      <stop offset=".71" stop-color="#d7ecfb"/>
+      <stop offset=".93" stop-color="#9bd5fa"/>
+      <stop offset="1" stop-color="#55b5f5"/>
+    </radialGradient>
+    <linearGradient id="face-edge" x1=".18" y1=".05" x2=".74" y2=".94">
+      <stop stop-color="#9ee3ff"/>
+      <stop offset=".31" stop-color="#3199e9"/>
+      <stop offset="1" stop-color="#7ccef8"/>
+    </linearGradient>
+    <linearGradient id="leather" x1=".14" y1=".06" x2=".84" y2=".94">
+      <stop stop-color="#ffc28b"/>
+      <stop offset=".19" stop-color="#e77c3c"/>
+      <stop offset=".42" stop-color="#a53b10"/>
+      <stop offset=".66" stop-color="#c54c14"/>
+      <stop offset="1" stop-color="#632005"/>
+    </linearGradient>
+    <linearGradient id="leather-rim" x1=".34" y1="0" x2=".67" y2="1">
+      <stop stop-color="#ffb46c"/>
+      <stop offset=".36" stop-color="#e9772d"/>
+      <stop offset=".76" stop-color="#b0440d"/>
+      <stop offset="1" stop-color="#782508"/>
+    </linearGradient>
+    <linearGradient id="leather-flap" x1=".1" y1=".3" x2=".86" y2=".7">
+      <stop stop-color="#f8a457"/>
+      <stop offset=".54" stop-color="#ed7425"/>
+      <stop offset="1" stop-color="#af3d07"/>
+    </linearGradient>
+    <linearGradient id="gold" x1=".15" y1="0" x2=".72" y2="1">
+      <stop stop-color="#ffffa1"/>
+      <stop offset=".28" stop-color="#ffcf00"/>
+      <stop offset=".59" stop-color="#ffb900"/>
+      <stop offset=".83" stop-color="#fff16a"/>
+      <stop offset="1" stop-color="#ffe12a"/>
+    </linearGradient>
+    <linearGradient id="gold-depth" x1="0" y1=".5" x2="1" y2=".5">
+      <stop stop-color="#9d4c00"/>
+      <stop offset=".22" stop-color="#ec9300"/>
+      <stop offset=".48" stop-color="#ffca1b"/>
+      <stop offset=".69" stop-color="#cd6b00"/>
+      <stop offset="1" stop-color="#9b4900"/>
+    </linearGradient>
+    <linearGradient id="lens" x1=".24" y1="1" x2=".74" y2="0">
+      <stop stop-color="#aafaff"/>
+      <stop offset=".32" stop-color="#37ddfc"/>
+      <stop offset=".67" stop-color="#008ff1"/>
+      <stop offset="1" stop-color="#004ac3"/>
+    </linearGradient>
+    <linearGradient id="navy" x1=".56" y1="0" x2=".4" y2="1">
+      <stop stop-color="#123a79"/>
+      <stop offset="1" stop-color="#020c27"/>
+    </linearGradient>
+    <radialGradient id="iris" cx=".5" cy="1" r=".98">
+      <stop stop-color="#2ec8ff"/>
+      <stop offset=".36" stop-color="#087fe8"/>
+      <stop offset=".68" stop-color="#05276d"/>
+      <stop offset="1" stop-color="#020d2c"/>
+    </radialGradient>
+    <radialGradient id="blush" cx=".27" cy=".19" r=".9">
+      <stop stop-color="#ffb5cb"/>
+      <stop offset=".6" stop-color="#ff7d9d"/>
+      <stop offset="1" stop-color="#fa6590"/>
+    </radialGradient>
+    <linearGradient id="mouth" x2="0" y2="1">
+      <stop stop-color="#580721"/>
+      <stop offset=".54" stop-color="#8c0b2e"/>
+      <stop offset="1" stop-color="#be1d4e"/>
+    </linearGradient>
+    <radialGradient id="tongue" cx=".38" cy=".25" r=".79">
+      <stop stop-color="#ff98ad"/>
+      <stop offset=".66" stop-color="#ff618c"/>
+      <stop offset="1" stop-color="#f13269"/>
+    </radialGradient>
+    <radialGradient id="glove" cx=".32" cy=".17" r=".91">
+      <stop offset=".16" stop-color="#fff"/>
+      <stop offset=".55" stop-color="#f0faff"/>
+      <stop offset=".86" stop-color="#b4dff9"/>
+      <stop offset="1" stop-color="#71bdf2"/>
+    </radialGradient>
+    <linearGradient id="remote-case" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#fff"/>
+      <stop offset=".45" stop-color="#f7f7fb"/>
+      <stop offset=".84" stop-color="#e9edf6"/>
+      <stop offset="1" stop-color="#c8d4e9"/>
+    </linearGradient>
+    <linearGradient id="remote-edge" x1=".1" y1=".1" x2=".85" y2=".92">
+      <stop stop-color="#f3f6ff"/>
+      <stop offset=".55" stop-color="#bcc9df"/>
+      <stop offset="1" stop-color="#6f97c9"/>
+    </linearGradient>
+    <linearGradient id="screen" x1=".12" y1=".14" x2=".88" y2=".91">
+      <stop stop-color="#0065a8"/>
+      <stop offset=".54" stop-color="#009ff1"/>
+      <stop offset="1" stop-color="#067dd2"/>
+    </linearGradient>
+    <linearGradient id="button" x2="0" y2="1">
+      <stop stop-color="#f0f1f8"/>
+      <stop offset="1" stop-color="#b8c3d9"/>
+    </linearGradient>
+    <linearGradient id="power" x1=".22" y1=".12" x2=".8" y2=".91">
+      <stop stop-color="#ff9b80"/>
+      <stop offset=".48" stop-color="#ff685b"/>
+      <stop offset="1" stop-color="#f43b34"/>
+    </linearGradient>
+
+    <path id="top-arm" d="M557 176L501 135C473 115 448 126 429 149C406 177 412 208 436 226L484 260L486 314H761L769 260L812 228C839 208 837 173 813 148C795 129 770 117 746 133L692 175L699 111C706 74 660 35 625 35C589 35 544 72 549 112Z"/>
+    <path id="side-arm" d="M263 538L181 574C148 590 116 572 104 543C92 516 102 491 130 479L196 457L117 437C86 423 79 387 96 353C114 319 147 301 177 319L247 356L234 305C225 273 245 248 274 242C306 234 330 252 338 281L363 382Z"/>
+    <path id="lower-arm" d="M356 793L319 925C309 958 282 971 250 959C219 948 204 926 211 896L224 853L154 892C123 911 89 900 75 867C62 838 66 803 96 788L178 748L119 720C89 704 88 675 105 652C123 630 148 627 173 640L260 688Z"/>
+    <path id="face-shape" d="M310 713C314 589 350 497 439 467C511 443 568 422 626 432C703 421 756 453 812 472C887 499 922 584 930 712C938 838 858 934 741 951C703 961 659 960 625 960C544 960 458 949 398 911C333 869 302 795 310 713Z"/>
+    <path id="mouth-shape" d="M489 705C489 687 499 680 516 687C564 704 593 712 630 712C677 712 715 704 753 688C771 680 782 683 779 705C775 805 713 887 631 889C553 890 494 813 489 705Z"/>
+    <path id="eye-white" d="M400 663C386 628 393 582 425 552C460 522 516 527 553 553C582 573 598 620 588 669C587 675 583 678 577 675C529 655 478 655 437 670C422 675 411 678 400 663Z"/>
+    <clipPath id="eye-clip"><use xlink:href="#eye-white"/></clipPath>
+    <clipPath id="mouth-clip"><use xlink:href="#mouth-shape"/></clipPath>
+    <clipPath id="lens-clip"><ellipse rx="130" ry="67"/></clipPath>
+
+    <g id="ice-top">
+      <use xlink:href="#top-arm" fill="url(#ice-arm)" stroke="url(#ice-edge)" stroke-width="5"/>
+      <path d="M625 54C589 54 560 86 570 112L579 188Q582 207 558 197L484 145Q455 128 436 159Q417 193 451 214L510 253L512 295H738L745 250L800 211Q826 190 807 159Q789 132 758 147L693 196Q674 211 672 190L679 111C688 87 658 54 625 54Z" fill="#fff" opacity=".23"/>
+      <path d="M622 62L628 291L641 282L639 73Z" fill="#fff" opacity=".27"/>
+    </g>
+    <g id="ice-side">
+      <use xlink:href="#side-arm" fill="url(#ice-arm)" stroke="url(#ice-edge)" stroke-width="5"/>
+      <path d="M266 513L177 550Q138 572 119 530Q112 508 144 495L209 469Q224 460 211 444L133 417Q96 401 114 365Q131 329 168 338L251 376Q269 386 269 366L251 301Q244 269 281 260Q311 255 320 290L340 390Z" fill="#fff" opacity=".31"/>
+    </g>
+    <g id="ice-lower">
+      <use xlink:href="#lower-arm" fill="url(#ice-arm)" stroke="url(#ice-edge)" stroke-width="5"/>
+      <path d="M330 793L303 912Q296 944 260 936Q226 925 232 904L245 854Q250 834 230 836L150 876Q114 892 95 852Q86 828 108 808L196 760Q217 748 194 733L128 703Q106 688 121 661Q137 643 163 654L254 710Z" fill="#fff" opacity=".32"/>
+    </g>
+    <g id="goggle">
+      <ellipse cy="32" rx="155" ry="86" fill="#7f2e09" opacity=".8"/>
+      <ellipse cy="25" rx="153" ry="88" fill="url(#gold-depth)" stroke="#9c4500" stroke-width="4"/>
+      <ellipse rx="153" ry="86" fill="url(#gold)" stroke="#fff49f" stroke-width="3"/>
+      <ellipse rx="136" ry="73" fill="#8c4400" stroke="#fff38b" stroke-width="3"/>
+      <ellipse rx="131" ry="68" fill="url(#lens)" stroke="#073a83" stroke-width="7"/>
+      <path d="M-143 19C-124 60-73 80-1 81C70 80 122 59 143 20" fill="none" stroke="#fff5a3" stroke-width="4" opacity=".85"/>
+    </g>
+    <g id="glass-reflections">
+      <path d="M-169 18L92-91L125-72L-152 48Z" fill="#9df7ff" opacity=".33"/>
+      <path d="M-97 86L176-29L155-50L-123 67Z" fill="#7be8ff" opacity=".46"/>
+    </g>
+    <g id="eye">
+      <path d="M386 653C373 615 383 576 407 551C451 505 521 507 559 542C593 568 605 615 596 658C593 673 590 682 577 675C530 655 479 657 437 671C414 680 396 675 386 653Z" fill="#081b47" stroke="#8bbfee" stroke-width="4"/>
+      <use xlink:href="#eye-white" fill="#fbfcff"/>
+      <g clip-path="url(#eye-clip)">
+        <ellipse cx="525" cy="637" rx="76" ry="87" fill="url(#iris)"/>
+        <ellipse cx="526" cy="608" rx="43" ry="58" fill="#010d2a" opacity=".53"/>
+        <circle cx="548" cy="585" r="22" fill="#fff"/>
+        <path d="M480 585Q483 599 497 602Q483 605 480 619Q477 605 463 602Q477 599 480 585Z" fill="#fff"/>
+      </g>
+    </g>
+    <g id="brow">
+      <path d="M417 517C405 509 418 475 436 457C470 426 527 436 550 471C560 484 561 490 551 486C522 468 495 467 472 474C448 481 431 498 423 515Q420 522 417 517Z"
+            fill="url(#navy)" stroke="#5399db" stroke-width="3"/>
+    </g>
+    <g id="cheek">
+      <ellipse cx="394" cy="717" rx="51" ry="35" fill="url(#blush)"/>
+      <ellipse cx="371" cy="694" rx="15" ry="6" transform="rotate(-21 371 694)" fill="#fff" opacity=".72"/>
+    </g>
+    <g id="mini-snow" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round">
+      <path d="M0-19V19M-6-16L0-10L6-16M-6 16L0 10L6 16"/>
+      <path d="M0-19V19M-6-16L0-10L6-16M-6 16L0 10L6 16" transform="rotate(60)"/>
+      <path d="M0-19V19M-6-16L0-10L6-16M-6 16L0 10L6 16" transform="rotate(120)"/>
+    </g>
+  </defs>
+
+  <g id="background">
+    <rect width="1254" height="1254" fill="url(#sky)"/>
+    <ellipse cx="668" cy="745" rx="559" ry="472" fill="url(#cast)"/>
+    <ellipse cx="675" cy="1004" rx="483" ry="192" fill="url(#cast)" opacity=".51"/>
+  </g>
+
+  <g id="snowflake-arms">
+    <use xlink:href="#ice-top"/>
+    <use xlink:href="#ice-side"/>
+    <use xlink:href="#ice-side" transform="translate(1240 0) scale(-1 1)"/>
+    <use xlink:href="#ice-lower"/>
+    <use xlink:href="#ice-top" transform="translate(0 1220) scale(1 -1)"/>
+  </g>
+
+  <g id="aviator-cap">
+    <path d="M239 645C208 553 258 438 338 365C418 291 533 272 629 274C731 272 844 307 927 381C995 443 1027 542 1001 633C954 582 902 550 853 510C770 445 686 424 626 434C544 430 467 479 400 512C329 547 282 592 239 645Z"
+          fill="url(#leather)" stroke="#9e3c13" stroke-width="5"/>
+    <path d="M249 574C250 495 296 421 364 371C444 312 547 276 621 276C720 277 834 312 902 378C954 429 983 500 993 563"
+          fill="none" stroke="#ffce9d" stroke-width="7" opacity=".66"/>
+    <path d="M240 644C220 589 242 535 288 492C372 414 516 388 628 402C741 386 887 414 971 493C1011 532 1020 591 1000 635C962 597 928 560 882 527C778 452 695 423 627 433C546 425 479 462 385 518C315 560 274 606 240 644Z"
+          fill="url(#leather-rim)" stroke="#9d370e" stroke-width="5"/>
+    <path d="M248 584C284 521 396 470 482 440C542 419 577 409 626 411C682 407 723 419 771 436C859 467 955 515 995 583"
+          fill="none" stroke="#ffb670" stroke-width="9" opacity=".81"/>
+    <path d="M588 290Q626 269 671 291L683 378Q626 359 575 380Z" fill="url(#leather-rim)" stroke="#8a2c09" stroke-width="6"/>
+    <path d="M599 310Q626 299 656 312" fill="none" stroke="#ffc18c" stroke-width="8" stroke-linecap="round"/>
+  </g>
+
+  <g id="face">
+    <use xlink:href="#face-shape" fill="url(#face-color)" stroke="url(#face-edge)" stroke-width="7"/>
+    <path d="M334 683C350 564 393 515 460 486C519 459 575 447 626 448C681 444 743 462 792 482C863 513 897 577 914 677"
+          fill="none" stroke="#faffff" stroke-width="13" stroke-opacity=".63" stroke-linecap="round"/>
+    <g id="ear-flaps">
+      <path d="M345 521C312 569 305 640 287 704C273 753 255 780 225 793C194 801 180 776 190 749C208 703 236 658 257 606C277 558 305 538 345 521Z"
+            fill="#873006" stroke="#832804" stroke-width="5"/>
+      <path d="M341 526C309 581 300 650 283 705C265 759 242 773 216 772C196 771 195 752 205 731C225 693 246 649 266 602C288 555 312 541 341 526Z"
+            fill="url(#leather-flap)"/>
+      <path d="M325 544C293 586 281 662 263 710C252 740 235 753 216 756" fill="none" stroke="#ffad62" stroke-width="8" stroke-linecap="round"/>
+      <path d="M898 522C930 548 960 575 975 615L936 662C927 606 908 566 898 522Z"
+            fill="url(#leather-rim)" stroke="#a84413" stroke-width="5"/>
+    </g>
+  </g>
+
+  <g id="gold-goggles">
+    <g transform="translate(453 349) rotate(-24)">
+      <use xlink:href="#goggle"/>
+      <g clip-path="url(#lens-clip)">
+        <use xlink:href="#glass-reflections"/>
+        <ellipse cx="-32" cy="-34" rx="32" ry="15" transform="rotate(-12 -32 -34)" fill="#f3ffff"/>
+      </g>
+    </g>
+    <g transform="translate(795 349) rotate(24)">
+      <use xlink:href="#goggle"/>
+      <g clip-path="url(#lens-clip)">
+        <use xlink:href="#glass-reflections" transform="rotate(-48)"/>
+        <ellipse cx="44" cy="-31" rx="31" ry="16" transform="rotate(16 44 -31)" fill="#f3ffff"/>
+      </g>
+    </g>
+  </g>
+  <g id="expression">
+    <use xlink:href="#brow"/>
+    <use xlink:href="#brow" transform="translate(1257 0) scale(-1 1)"/>
+    <use xlink:href="#eye"/>
+    <use xlink:href="#eye" transform="translate(1278 0) scale(-1 1)"/>
+    <use xlink:href="#cheek"/>
+    <use xlink:href="#cheek" transform="translate(1257 0) scale(-1 1)"/>
+    <use xlink:href="#mouth-shape" fill="url(#mouth)" stroke="#f1fbff" stroke-width="7"/>
+    <g clip-path="url(#mouth-clip)">
+      <ellipse cx="630" cy="841" rx="109" ry="86" fill="#f73570"/>
+      <ellipse cx="631" cy="842" rx="77" ry="51" fill="url(#tongue)"/>
+      <ellipse cx="583" cy="807" rx="13" ry="8" transform="rotate(-27 583 807)" fill="#fff" opacity=".72"/>
+    </g>
+  </g>
+
+  <g id="left-glove">
+    <path d="M318 1008C298 976 321 924 351 890C383 855 426 835 458 843C503 847 527 879 510 910C505 919 497 926 490 929C498 950 482 978 459 983C451 1006 430 1014 410 1006C379 1059 333 1043 318 1008Z"
+          fill="url(#glove)" stroke="#a4dcfa" stroke-width="4"/>
+    <path d="M353 927C386 884 424 865 460 874C491 882 505 902 500 920C491 949 470 952 453 945C443 976 422 987 402 982C385 1013 351 1014 340 987C330 968 340 947 353 927Z"
+          fill="#f5fbff" opacity=".57"/>
+    <path d="M445 877Q485 882 500 912M425 918Q466 924 477 951" fill="none" stroke="#76bff0" stroke-width="6" opacity=".6" stroke-linecap="round"/>
+  </g>
+  <g id="right-palm">
+    <path d="M1012 892C1040 844 1094 832 1121 858C1156 895 1136 956 1112 987C1082 1028 1038 1053 1009 1031C984 1012 984 951 1012 892Z" fill="url(#glove)"/>
+  </g>
+
+  <g id="ac-remote" transform="translate(930 601) rotate(18)">
+    <rect x="5" y="16" width="243" height="459" rx="70" fill="#0453a0" opacity=".32"/>
+    <rect x="2" y="12" width="242" height="453" rx="69" fill="url(#remote-edge)" stroke="#93b8e4" stroke-width="4"/>
+    <rect x="0" y="0" width="234" height="443" rx="64" fill="url(#remote-case)" stroke="#fbfcff" stroke-width="4"/>
+    <rect x="20" y="20" width="193" height="179" rx="47" fill="#1f406c" stroke="#cbd5ea" stroke-width="4"/>
+    <rect x="26" y="26" width="181" height="167" rx="42" fill="url(#screen)" stroke="#0768ad" stroke-width="3"/>
+    <path d="M41 69Q43 49 61 42" fill="none" stroke="#e5fbff" stroke-width="6" stroke-linecap="round"/>
+    <use xlink:href="#mini-snow" transform="translate(158 55)"/>
+    <g id="ac-display">
+      <rect x="50" y="81" width="128" height="50" rx="11" fill="#78c4ed"/>
+      <rect x="48" y="76" width="130" height="50" rx="11" fill="#f7fcff"/>
+      <path d="M57 110H166V120H57Z" fill="#1a6ca6"/>
+      <path d="M57 114H166M149 101h16" fill="none" stroke="#b2e5ff" stroke-width="3"/>
+      <g fill="none" stroke="#a4edff" stroke-width="6" stroke-linecap="round">
+        <path d="M78 137Q75 155 63 166M110 137Q105 150 107 160M141 137Q136 154 146 164"/>
+      </g>
+    </g>
+    <g id="temperature-buttons" fill="url(#button)" stroke="#a3afc9" stroke-width="3">
+      <rect x="21" y="211" width="86" height="55" rx="25"/>
+      <rect x="126" y="211" width="86" height="55" rx="25"/>
+    </g>
+    <g fill="#405676">
+      <path d="M64 222L80 245H48Z"/>
+      <path d="M169 252L185 229H153Z"/>
+    </g>
+    <g id="power-button">
+      <circle cx="118" cy="340" r="75" fill="#d8dde9" stroke="#f9faff" stroke-width="3"/>
+      <circle cx="118" cy="342" r="67" fill="#db242c"/>
+      <circle cx="118" cy="336" r="65" fill="url(#power)" stroke="#ffd0bd" stroke-width="4"/>
+      <path d="M118 298V328M100 311A29 29 0 1 0 136 311" fill="none" stroke="#fff6f2" stroke-width="8" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <g id="right-glove" fill="url(#glove)" stroke="#a4dafa" stroke-width="2">
+    <ellipse cx="1096" cy="893" rx="47" ry="54" transform="rotate(22 1096 893)"/>
+    <ellipse cx="1071" cy="956" rx="45" ry="52" transform="rotate(30 1071 956)"/>
+    <ellipse cx="1048" cy="1000" rx="42" ry="47" transform="rotate(29 1048 1000)"/>
+  </g>
+</svg>
