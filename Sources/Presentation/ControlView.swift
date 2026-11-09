@@ -12,7 +12,7 @@ struct ControlView: View {
         self.unit = unit
         self.library = library
         self.devices = devices
-        _viewModel = State(initialValue: ACControlViewModel(device: devices.make(unit, address)))
+        _viewModel = State(initialValue: ACControlViewModel(device: devices.make(unit, address), unitID: unit.id))
     }
 
     var body: some View {

@@ -4,6 +4,7 @@ import Observation
 @MainActor @Observable
 final class ACControlViewModel {
     private let device: any ACDevice
+    private let unitID: UUID
     private let applyChange: ApplyACChange
     private(set) var status: ACStatus?
     private(set) var updatedAt: Date?
@@ -22,9 +23,10 @@ final class ACControlViewModel {
         case writing
     }
 
-    init(device: any ACDevice) {
+    init(device: any ACDevice, unitID: UUID) {
         self.device = device
-        applyChange = ApplyACChange(device: device)
+        self.unitID = unitID
+        applyChange = ApplyACChange(device: device, unitID: unitID)
     }
 
     func canAdjust(by delta: Int) -> Bool {
@@ -117,6 +119,8 @@ final class ACControlViewModel {
                 status = nil
             }
             message = result.message
+            ACWidgetStore.recordFailure(nil, for: unitID)
+            ACWidgetStore.reload()
         } catch is CancellationError {
             status = nil
         } catch {

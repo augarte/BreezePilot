@@ -4,6 +4,8 @@
 <dict>
     <key>CFBundleDisplayName</key>
     <string>BreezePilot</string>
+    <key>BreezePilotAppGroup</key>
+    <string>$(BREEZEPILOT_APP_GROUP)</string>
     <key>NSLocalNetworkUsageDescription</key>
     <string>BreezePilot connects directly to your air conditioners over home Wi-Fi to read their status and adjust settings.</string>
     <key>NSAppTransportSecurity</key>
@@ -22,6 +24,17 @@
             <dict><key>NSExceptionAllowsInsecureHTTPLoads</key><true/></dict>
         </dict>
     </dict>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleURLName</key>
+            <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>breezepilot</string>
+            </array>
+        </dict>
+    </array>
     <key>UILaunchScreen</key>
     <dict/>
 </dict>

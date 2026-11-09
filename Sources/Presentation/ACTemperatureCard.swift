@@ -43,13 +43,7 @@ struct ACTemperatureCard: View {
         .foregroundStyle(.white)
         .background {
             RoundedRectangle(cornerRadius: 26)
-                .fill(
-                    LinearGradient(
-                        colors: [BreezePilotPalette.action, BreezePilotPalette.navy],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .fill(BreezePilotPalette.temperatureGradient)
         }
     }
 
@@ -68,11 +62,7 @@ struct ACTemperatureCard: View {
         return Button {
             viewModel.adjust(by: delta)
         } label: {
-            Image(systemName: delta > 0 ? "plus" : "minus")
-                .font(.system(size: 20, weight: .semibold))
-                .frame(width: 48, height: 48)
-                .foregroundStyle(.white.opacity(enabled ? 1 : 0.4))
-                .background(.white.opacity(enabled ? 0.2 : 0.08), in: Circle())
+            ACTemperatureStepIcon(symbol: delta > 0 ? "plus" : "minus", enabled: enabled)
         }
         .buttonStyle(.plain)
         .disabled(!enabled)

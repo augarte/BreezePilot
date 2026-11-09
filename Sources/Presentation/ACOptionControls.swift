@@ -155,12 +155,7 @@ private struct ACOptionButton: View {
             Text(title)
                 .font(.subheadline.weight(.semibold))
                 .frame(maxWidth: .infinity, minHeight: 44)
-                .foregroundStyle(selected ? Color.white : BreezePilotPalette.accent)
-                .background(
-                    selected ? BreezePilotPalette.action : BreezePilotPalette.ice,
-                    in: RoundedRectangle(cornerRadius: 12)
-                )
-                .opacity(available ? 1 : 0.45)
+                .modifier(ACOptionAppearance(selected: selected, available: available))
         }
         .buttonStyle(.plain)
         .disabled(!available || busy)

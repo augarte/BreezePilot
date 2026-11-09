@@ -2,24 +2,28 @@ import SwiftUI
 
 @main
 struct BreezePilotApp: App {
-    @State private var library = {
+    @State private var library: ACLibrary
+    private let devices: ACDevices
+
+    init() {
         #if DEBUG
-        if ProcessInfo.processInfo.environment["BREEZEPILOT_UNIT_TESTING"] == "1",
+        let environment = ProcessInfo.processInfo.environment
+        if environment["BREEZEPILOT_UNIT_TESTING"] == "1",
            let defaults = UserDefaults(suiteName: "local.breezepilot.test-host") {
-            return ACLibrary(defaults: defaults, fallbackAddress: nil)
+            _library = State(initialValue: ACLibrary(defaults: defaults, fallbackAddress: nil))
+            devices = .local
+            return
         }
         #endif
-        return ACLibrary()
-    }()
-    private let devices = ACDevices(
-        make: { unit, address in
-            if let profile = unit.xiaomi {
-                return XiaomiClient(address: address, profile: profile, credentials: .stored(unit.id))
-            }
-            return DaikinClient(address: address)
-        },
-        xiaomiSetup: XiaomiLocalSetup()
-    )
+        _library = State(initialValue: ACLibrary())
+        devices = .local
+    }
+
+    private var widgetCatalog: [WidgetAC] {
+        library.units.map { unit in
+            WidgetAC(unit: unit, roomName: library.rooms.first { $0.id == unit.roomID }?.name)
+        }
+    }
 
     var body: some Scene {
         WindowGroup {
@@ -37,6 +41,13 @@ struct BreezePilotApp: App {
                     }
             }
             .tint(BreezePilotPalette.accent)
+            .onChange(of: widgetCatalog, initial: true) { _, catalog in
+                ACWidgetStore.publish(catalog)
+            }
+            .onOpenURL { url in
+                guard url.scheme == ACWidgetStore.homeURL.scheme, url.host == ACWidgetStore.homeURL.host else { return }
+                library.select(UUID(uuidString: url.lastPathComponent))
+            }
         }
     }
 }

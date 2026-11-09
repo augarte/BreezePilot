@@ -9,6 +9,7 @@ enum BreezePilotPalette {
     static let canvas = adaptive(light: 0xF2F7FF, dark: 0x0D1728)
     static let surface = adaptive(light: 0xFFFFFF, dark: 0x17243A)
     static let ice = adaptive(light: 0xEAF3FF, dark: 0x203550)
+    static let temperatureGradient = LinearGradient(colors: [action, navy], startPoint: .topLeading, endPoint: .bottomTrailing)
 
     private static func adaptive(light: UInt32, dark: UInt32) -> Color {
         Color(uiColor: UIColor { traits in

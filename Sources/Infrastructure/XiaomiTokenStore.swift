@@ -17,19 +17,43 @@ struct XiaomiLocalSetup: XiaomiSetup {
 
 enum XiaomiTokenStore {
     static func read(for id: UUID) throws -> XiaomiToken {
-        var query = query(for: id)
+        if ACWidgetStore.container != nil, let token = read(for: id, shared: true) {
+            return token
+        }
+        guard let token = read(for: id, shared: false) else { throw XiaomiError.missingToken }
+        return token
+    }
+
+    static func shareLegacyToken(for id: UUID) {
+        guard let legacy = read(for: id, shared: false) else { return }
+        do {
+            if read(for: id, shared: true) == nil {
+                try save(legacy, for: id, shared: true)
+            }
+            try remove(for: id, shared: false)
+        } catch {
+            // Keep the existing token when migration cannot complete.
+        }
+    }
+
+    private static func read(for id: UUID, shared: Bool) -> XiaomiToken? {
+        var query = query(for: id, shared: shared)
         query[kSecReturnData as String] = true
         query[kSecMatchLimit as String] = kSecMatchLimitOne
         var result: CFTypeRef?
         let status = SecItemCopyMatching(query as CFDictionary, &result)
-        guard status == errSecSuccess, let data = result as? Data, let token = XiaomiToken(bytes: data) else {
-            throw XiaomiError.missingToken
-        }
-        return token
+        guard status == errSecSuccess, let data = result as? Data else { return nil }
+        return XiaomiToken(bytes: data)
     }
 
     static func save(_ token: XiaomiToken, for id: UUID) throws {
-        let query = query(for: id)
+        let shared = ACWidgetStore.container != nil
+        try save(token, for: id, shared: shared)
+        if shared { try? remove(for: id, shared: false) }
+    }
+
+    private static func save(_ token: XiaomiToken, for id: UUID, shared: Bool) throws {
+        let query = query(for: id, shared: shared)
         let values = [
             kSecValueData as String: token.bytes,
             kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly
@@ -44,16 +68,23 @@ enum XiaomiTokenStore {
     }
 
     static func remove(for id: UUID) throws {
-        let status = SecItemDelete(query(for: id) as CFDictionary)
+        try remove(for: id, shared: false)
+        if ACWidgetStore.container != nil { try remove(for: id, shared: true) }
+    }
+
+    private static func remove(for id: UUID, shared: Bool) throws {
+        let status = SecItemDelete(query(for: id, shared: shared) as CFDictionary)
         guard status == errSecSuccess || status == errSecItemNotFound else { throw XiaomiError.keychain }
     }
 
-    private static func query(for id: UUID) -> [String: Any] {
-        [
+    private static func query(for id: UUID, shared: Bool) -> [String: Any] {
+        var attributes: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: "local.daikin.directcontrol.xiaomi",
+            kSecAttrService as String: shared ? "local.daikin.directcontrol.xiaomi.shared" : "local.daikin.directcontrol.xiaomi",
             kSecAttrAccount as String: id.uuidString
         ]
+        if shared { attributes[kSecAttrAccessGroup as String] = ACWidgetStore.group }
+        return attributes
     }
 }
 

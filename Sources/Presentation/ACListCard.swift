@@ -52,7 +52,7 @@ struct ACListCard: View {
         let active = status?.isOn == true
         return HStack(spacing: 6) {
             Circle()
-                .fill(active ? BreezePilotPalette.gold : Color.secondary)
+                .fill(active ? Color(uiColor: .systemGreen) : Color.secondary)
                 .frame(width: 6, height: 6)
                 .accessibilityHidden(true)
             Text(stateLabel)
