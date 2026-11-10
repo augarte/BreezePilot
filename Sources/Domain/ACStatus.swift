@@ -22,6 +22,8 @@ struct LocalAddress: Equatable, Sendable {
 }
 
 struct ACStatus: Sendable {
+    static let temperatureEditDelay: TimeInterval = 0.75
+
     let isOn: Bool
     let mode: ClimateMode?
     let availableModes: [ClimateMode]

@@ -97,22 +97,47 @@ struct AdjustACWidgetTemperatureIntent: AppIntent {
     @Parameter(title: "Target") var target: Int
     @Parameter(title: "Previous Target") var previous: Int
     @Parameter(title: "Mode") var mode: String
+    @Parameter(title: "Minimum Target") var minimum: Int?
+    @Parameter(title: "Maximum Target") var maximum: Int?
+    @Parameter(title: "Reading Date") var observedAt: Date?
 
     init() {}
 
-    init(unit: AirConditionerEntity, target: Int, previous: Int, mode: ClimateMode) {
+    init(unit: AirConditionerEntity, target: Int, previous: Int, mode: ClimateMode,
+         limits: ClosedRange<Int>, observedAt: Date) {
         self.unit = unit
         self.target = target
         self.previous = previous
         self.mode = mode.rawValue
+        self.minimum = limits.lowerBound
+        self.maximum = limits.upperBound
+        self.observedAt = observedAt
     }
 
     func perform() async throws -> some IntentResult {
-        try await ACIntentCommand.run(for: unit.id) { _ in
+        do {
             guard let climateMode = ClimateMode(rawValue: mode) else {
                 throw ACIntentCommand.Failure(message: "The AC’s mode is unavailable.")
             }
-            return .target(target, previous: previous, mode: climateMode)
+            // Already rendered widgets may still carry the previous version of this intent.
+            guard let minimum, let maximum, minimum <= maximum else {
+                try await ACIntentCommand.run(for: unit.id) { _ in
+                    .target(target, previous: previous, mode: climateMode)
+                }
+                return .result()
+            }
+            guard let directory = ACWidgetStore.container else {
+                throw ACIntentCommand.Failure(message: "BreezePilot couldn’t share this temperature change with the widget.")
+            }
+            try ACWidgetTemperatureEdits(directory: directory).enqueue(
+                for: unit.id, previous: previous, target: target, mode: climateMode,
+                limits: minimum...maximum, observedAt: observedAt ?? .distantPast
+            )
+        } catch is CancellationError {
+            throw CancellationError()
+        } catch {
+            ACWidgetStore.recordFailure(error.localizedDescription, for: unit.id)
+            ACWidgetStore.reload()
         }
         return .result()
     }

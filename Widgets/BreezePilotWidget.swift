@@ -358,9 +358,10 @@ private struct ACWidgetTile: View {
     }
 
     private func temperatureIntent(_ direction: Int, status: ACStatus) -> AdjustACWidgetTemperatureIntent? {
-        guard let previous = status.target, let mode = status.mode,
+        guard let previous = status.target, let mode = status.mode, let limits = status.limits,
               let target = status.adjusted(by: direction) else { return nil }
-        return AdjustACWidgetTemperatureIntent(unit: reading.unit, target: target, previous: previous, mode: mode)
+        return AdjustACWidgetTemperatureIntent(unit: reading.unit, target: target, previous: previous,
+                                               mode: mode, limits: limits, observedAt: reading.observedAt)
     }
 
     private func fanIntent(_ direction: Int, status: ACStatus) -> SetACWidgetFanSpeedIntent? {

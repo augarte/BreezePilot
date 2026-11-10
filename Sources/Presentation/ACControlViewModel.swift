@@ -64,7 +64,7 @@ final class ACControlViewModel {
         let change = ACChange.target(target, previous: status.target, mode: mode)
         adjustmentTask = Task { [weak self] in
             do {
-                try await Task.sleep(for: .milliseconds(750))
+                try await Task.sleep(for: .seconds(ACStatus.temperatureEditDelay))
             } catch {
                 return
             }

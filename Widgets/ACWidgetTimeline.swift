@@ -35,6 +35,7 @@ struct ACWidgetReading: Identifiable {
     let unit: AirConditionerEntity
     let status: ACStatus?
     var failure: String?
+    var observedAt = Date.now
 
     var id: UUID { unit.id }
 }
@@ -67,7 +68,14 @@ struct ACWidgetTimeline: AppIntentTimelineProvider {
                 group.addTask {
                     let status: ACStatus?
                     if let address = LocalAddress(item.unit.address) {
-                        status = try? await ACDevices.local.make(item.unit, address).readStatus()
+                        let device = ACDevices.local.make(item.unit, address)
+                        if let directory = ACWidgetStore.container,
+                           let updated = await ACWidgetTemperatureEdits(directory: directory)
+                            .applyPending(for: item.unit.id, device: device) {
+                            status = updated
+                        } else {
+                            status = try? await device.readStatus()
+                        }
                     } else {
                         status = nil
                     }
