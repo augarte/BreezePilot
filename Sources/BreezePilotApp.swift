@@ -50,7 +50,7 @@ struct BreezePilotApp: App {
                             }
                         }
                 }
-                .tabItem { Label("Air Conditioners", systemImage: "snowflake") }
+                .tabItem { Label("Control", systemImage: "snowflake") }
                 .tag(Tab.airConditioners)
 
                 ACSetupsView(requestedSetupID: $requestedSetupID, library: library, devices: devices)

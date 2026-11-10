@@ -31,7 +31,7 @@ struct ACSetupEditor: View {
                     if let target = draft.targets.first(where: { $0.id == activeID }) {
                         stateEditor(for: target)
                     } else {
-                        Text(library.units.isEmpty ? "Add an AC in Air Conditioners before creating a scene."
+                        Text(library.units.isEmpty ? "Add an AC in Control before creating a scene."
                              : "Add an air conditioner to choose its target state.")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)

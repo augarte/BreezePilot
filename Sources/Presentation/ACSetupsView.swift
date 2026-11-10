@@ -92,7 +92,7 @@ struct ACSetupsView: View {
                 .font(.system(size: 34, weight: .medium))
                 .foregroundStyle(BreezePilotPalette.accent)
             Text("No scenes yet").font(.title3.weight(.semibold))
-            Text(library.units.isEmpty ? "Add an AC in Air Conditioners to get started."
+            Text(library.units.isEmpty ? "Add an AC in Control to get started."
                  : "Save settings for multiple ACs and apply them with one tap.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
