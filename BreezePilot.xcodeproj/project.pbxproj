@@ -83,7 +83,6 @@
 				Presentation/ControlView.swift,
 				Presentation/LibrarySettingsView.swift,
 				Presentation/PrivacyPolicyView.swift,
-				Presentation/RoomConditionsView.swift,
 				Presentation/XiaomiTokenHelpView.swift,
 			);
 			target = 7DA300000000000000000001 /* BreezePilotWidgets */;

@@ -13,6 +13,7 @@ struct BreezePilotWidget: Widget {
         .configurationDisplayName("Air Conditioners")
         .description("See and control your saved air conditioners.")
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
+        .contentMarginsDisabled()
     }
 }
 
@@ -22,28 +23,35 @@ private struct ACWidgetView: View {
 
     var body: some View {
         Group {
-            if entry.readings.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    Image(systemName: "snowflake")
-                        .foregroundStyle(.tint)
-                    Text("Air Conditioners")
-                        .font(.headline)
-                    Text(entry.hasSavedUnits ? "Choose an AC in Edit Widget." : "Add an AC in BreezePilot to get started.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+            if let first = entry.readings.first {
+                VStack(spacing: spacing) {
+                    widgetHeader
+                    units(first: first)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-            } else if family == .systemLarge {
-                largeLayout
-            } else if entry.readings.count == 1, let reading = entry.readings.first {
-                ACWidgetTile(reading: reading, compact: family == .systemSmall,
-                             linksToAC: family != .systemSmall, showsRefresh: true)
+                .padding(family == .systemSmall ? 8 : 10)
             } else {
-                row(entry.readings)
+                emptyState
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .tint(BreezePilotPalette.accent)
         .widgetURL(widgetURL)
+    }
+
+    private var spacing: CGFloat { family == .systemSmall ? 4 : 6 }
+
+    private var emptyState: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Image(systemName: "snowflake")
+                .foregroundStyle(.tint)
+            Text("Air Conditioners")
+                .font(.headline)
+            Text(entry.hasSavedUnits ? "Choose an AC in Edit Widget." : "Add an AC in BreezePilot to get started.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        .padding(16)
     }
 
     private var widgetURL: URL? {
@@ -53,45 +61,59 @@ private struct ACWidgetView: View {
         return ACWidgetStore.homeURL
     }
 
-    private var largeLayout: some View {
-        let usesGrid = entry.readings.count > 2
-        return VStack(alignment: .leading, spacing: usesGrid ? 6 : 8) {
-            widgetHeader
-            Divider()
-            if usesGrid {
-                row(Array(entry.readings.prefix(2)))
-                Divider()
-                row(Array(entry.readings.dropFirst(2)))
-            } else {
-                ForEach(entry.readings) { reading in
-                    ACWidgetTile(reading: reading, compact: false, linksToAC: true)
-                    if reading.id != entry.readings.last?.id { Divider() }
+    @ViewBuilder
+    private func units(first: ACWidgetReading) -> some View {
+        let readings = entry.readings
+        switch (family, readings.count) {
+        case (.systemSmall, _):
+            ACWidgetTile(reading: first, style: .compact, linksToAC: false)
+        case (.systemLarge, 1):
+            ACWidgetTile(reading: first, style: .featured)
+        case (.systemLarge, 2):
+            VStack(spacing: spacing) {
+                ForEach(readings) { reading in
+                    ACWidgetTile(reading: reading, style: .wide)
                 }
             }
+        case (.systemLarge, 3):
+            VStack(spacing: spacing) {
+                ACWidgetTile(reading: first, style: .wide)
+                row(readings.dropFirst())
+            }
+        case (.systemLarge, _):
+            VStack(spacing: spacing) {
+                row(readings.prefix(2))
+                row(readings.dropFirst(2))
+            }
+        case (_, 1):
+            ACWidgetTile(reading: first, style: .wide)
+        default:
+            row(readings[...])
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
     private var widgetHeader: some View {
-        HStack(spacing: 4) {
-            Label("Air Conditioners", systemImage: "snowflake")
-                .font(.headline)
+        let small = family == .systemSmall
+        let title: LocalizedStringKey = small ? "BreezePilot" : "Air Conditioners"
+        return HStack(spacing: 4) {
+            Label(title, systemImage: "snowflake")
+                .font((small ? Font.caption : .subheadline).weight(.semibold))
                 .lineLimit(1)
                 .minimumScaleFactor(0.75)
                 .foregroundStyle(BreezePilotPalette.accent)
             Spacer(minLength: 0)
-            ACWidgetRefreshButton(compact: false)
+            ACWidgetRefreshButton(compact: small)
         }
+        .padding(.horizontal, 2)
     }
 
-    private func row(_ readings: [ACWidgetReading]) -> some View {
-        HStack(spacing: 10) {
+    private func row(_ readings: ArraySlice<ACWidgetReading>) -> some View {
+        HStack(spacing: spacing) {
             ForEach(readings) { reading in
-                ACWidgetTile(reading: reading, compact: readings.count > 1, linksToAC: true,
-                             showsRefresh: family != .systemLarge && reading.id == readings.last?.id)
-                if reading.id != readings.last?.id { Divider() }
+                ACWidgetTile(reading: reading, style: .compact)
             }
         }
+        .frame(maxHeight: .infinity)
     }
 }
 
@@ -99,7 +121,7 @@ private struct ACWidgetRefreshButton: View {
     let compact: Bool
 
     var body: some View {
-        let diameter: CGFloat = compact ? 18 : 22
+        let diameter: CGFloat = compact ? 22 : 26
         Button(intent: RefreshACWidgetIntent()) {
             Image(systemName: "arrow.clockwise")
                 .font(.system(size: compact ? 11 : 13, weight: .semibold))
@@ -107,7 +129,7 @@ private struct ACWidgetRefreshButton: View {
                 .foregroundStyle(BreezePilotPalette.accent)
                 .frame(width: diameter, height: diameter)
                 .background(BreezePilotPalette.ice, in: Circle())
-                .frame(width: compact ? 22 : 28)
+                .frame(width: compact ? 26 : 32, height: diameter)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.borderless)
@@ -116,48 +138,60 @@ private struct ACWidgetRefreshButton: View {
 }
 
 private struct ACWidgetTile: View {
-    let reading: ACWidgetReading
-    let compact: Bool
-    let linksToAC: Bool
-    var showsRefresh = false
+    enum Style {
+        case compact, wide, featured
 
-    var body: some View {
-        HStack(spacing: compact ? 6 : 10) {
-            if let status = reading.status, status.powerWritable {
-                powerButton(status)
-            }
-            VStack(alignment: .leading, spacing: 2) {
-                header
-                controls
+        var powerWidth: CGFloat {
+            switch self {
+            case .compact: 25
+            case .wide: 42
+            case .featured: 52
             }
         }
+    }
+
+    let reading: ACWidgetReading
+    let style: Style
+    var linksToAC = true
+
+    private var compact: Bool { style == .compact }
+
+    var body: some View {
+        HStack(spacing: compact ? 4 : 8) {
+            if let status = reading.status {
+                power(status)
+            }
+            VStack(alignment: .leading, spacing: style == .featured ? 8 : 4) {
+                header
+                if let status = reading.status {
+                    if style == .featured, status.room.hasReading {
+                        RoomConditionsView(conditions: status.room)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    controls(status)
+                } else {
+                    Text("Unavailable")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Spacer(minLength: 0)
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        }
+        .padding(compact ? 4 : 6)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        .background(BreezePilotPalette.surface, in: RoundedRectangle(cornerRadius: compact ? 12 : 15))
     }
 
     private var header: some View {
         HStack(spacing: 4) {
             name.layoutPriority(1)
-            if let status = reading.status, !status.powerWritable {
-                Text(status.isOn ? "On" : "Off")
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(status.isOn ? BreezePilotPalette.accent : Color.secondary)
-                    .transition(.identity)
-            }
             if let failure = reading.failure {
                 Image(systemName: "exclamationmark.circle.fill")
+                    .font(.caption2)
                     .foregroundStyle(.orange)
                     .accessibilityLabel(Text(failure))
-            }
-            if !compact, let roomName = reading.unit.roomName {
-                Spacer(minLength: 0)
-                Text(roomName)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-            }
-            if showsRefresh && (!compact || reading.status == nil) {
-                if compact || reading.unit.roomName == nil { Spacer(minLength: 0) }
-                ACWidgetRefreshButton(compact: compact)
             }
         }
     }
@@ -165,9 +199,10 @@ private struct ACWidgetTile: View {
     @ViewBuilder
     private var name: some View {
         let title = Text(reading.unit.name)
-            .font(compact ? .caption.weight(.semibold) : .headline)
+            .font((compact ? Font.caption : style == .featured ? .title3 : .subheadline).weight(.semibold))
+            .foregroundStyle(Color.primary)
             .lineLimit(1)
-            .minimumScaleFactor(0.75)
+            .minimumScaleFactor(0.8)
         if linksToAC {
             Link(destination: ACWidgetStore.controlURL(for: reading.id)) { title }
         } else {
@@ -175,44 +210,50 @@ private struct ACWidgetTile: View {
         }
     }
 
-    @ViewBuilder
-    private var controls: some View {
-        if let status = reading.status {
-            VStack(alignment: .leading, spacing: compact ? 2 : 4) {
-                stepRow(.temperature,
-                        value: temperatureValue(status),
-                        decrease: temperatureIntent(-1, status: status),
-                        increase: temperatureIntent(1, status: status))
-                stepRow(.fan,
-                        value: status.isOn ? status.fan?.selected?.label : nil,
-                        decrease: fanIntent(-1, status: status),
-                        increase: fanIntent(1, status: status))
-            }
-        } else {
-            Text("Unavailable")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+    private func controls(_ status: ACStatus) -> some View {
+        VStack(spacing: style == .featured ? 7 : 4) {
+            stepRow(.temperature,
+                    value: temperatureValue(status),
+                    decrease: temperatureIntent(-1, status: status),
+                    increase: temperatureIntent(1, status: status))
+            stepRow(.fan,
+                    value: status.isOn ? status.fan?.selected?.label : nil,
+                    decrease: fanIntent(-1, status: status),
+                    increase: fanIntent(1, status: status))
         }
     }
 
-    private func powerButton(_ status: ACStatus) -> some View {
-        Button(intent: SetACPowerIntent(unit: reading.unit, isOn: !status.isOn)) {
-            VStack(spacing: 4) {
-                Image(systemName: "power")
-                    .font(.system(size: compact ? 15 : 20, weight: .semibold))
-                Text(status.isOn ? "On" : "Off")
-                    .font(.caption2.weight(.semibold))
-                    .transition(.identity)
+    @ViewBuilder
+    private func power(_ status: ACStatus) -> some View {
+        if status.powerWritable {
+            Button(intent: SetACPowerIntent(unit: reading.unit, isOn: !status.isOn)) {
+                powerLabel(status)
             }
-            .foregroundStyle(status.isOn ? BreezePilotPalette.accent : Color.secondary)
-            .frame(width: compact ? 29 : 44)
-            .frame(maxHeight: .infinity)
-            .background(BreezePilotPalette.ice, in: RoundedRectangle(cornerRadius: 11))
-            .contentShape(Rectangle())
+            .buttonStyle(.borderless)
+            .accessibilityLabel(status.isOn ? "Turn \(reading.unit.name) off" : "Turn \(reading.unit.name) on")
+            .accessibilityValue(status.isOn ? "AC is on" : "AC is off")
+        } else {
+            powerLabel(status)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(status.isOn ? "AC is on" : "AC is off")
         }
-        .buttonStyle(.borderless)
-        .accessibilityLabel(status.isOn ? "Turn \(reading.unit.name) off" : "Turn \(reading.unit.name) on")
-        .accessibilityValue(status.isOn ? "AC is on" : "AC is off")
+    }
+
+    private func powerLabel(_ status: ACStatus) -> some View {
+        let highlighted = status.isOn && status.powerWritable
+        return VStack(spacing: 3) {
+            Image(systemName: "power")
+                .font(.system(size: compact ? 14 : style == .featured ? 23 : 18, weight: .semibold))
+            Text(status.isOn ? "On" : "Off")
+                .font(.caption2.weight(.semibold))
+                .transition(.identity)
+        }
+        .foregroundStyle(highlighted ? BreezePilotPalette.accent : Color.secondary)
+        .frame(width: style.powerWidth)
+        .frame(maxHeight: .infinity)
+        .background(highlighted ? BreezePilotPalette.ice : Color.secondary.opacity(0.12),
+                    in: RoundedRectangle(cornerRadius: 9))
+        .contentShape(Rectangle())
     }
 
     private enum StepKind {
@@ -220,6 +261,7 @@ private struct ACWidgetTile: View {
 
         var icon: String { self == .temperature ? "thermometer.medium" : "fan" }
         var title: LocalizedStringKey { self == .temperature ? "Target temperature" : "Fan speed" }
+        var shortTitle: LocalizedStringKey { self == .temperature ? "Set temperature" : "Fan speed" }
     }
 
     private func stepRow<Intent: AppIntent>(
@@ -228,44 +270,44 @@ private struct ACWidgetTile: View {
         decrease: Intent?,
         increase: Intent?
     ) -> some View {
-        let readout = HStack(spacing: 4) {
-            Image(systemName: kind.icon)
-                .foregroundStyle(.secondary)
-                .frame(width: 12)
-                .accessibilityHidden(true)
-            Text(value ?? "—")
-                .monospacedDigit()
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-                .foregroundStyle(value == nil ? Color.secondary : Color.primary)
-                .accessibilityLabel(Text(kind.title))
-                .accessibilityValue(value ?? "Unavailable")
-                .transition(.identity)
-            if compact && showsRefresh && kind == .fan {
-                Spacer(minLength: 0)
-                ACWidgetRefreshButton(compact: true)
-            }
-        }
-        .font((compact ? Font.caption2 : .caption).weight(.semibold))
-        let buttons = HStack(spacing: 4) {
+        HStack(spacing: compact ? 2 : 5) {
             stepButton(-1, kind: kind, intent: decrease)
+            stepReadout(kind, value: value)
             stepButton(1, kind: kind, intent: increase)
         }
         .buttonStyle(.plain)
-        return Group {
-            if compact {
-                VStack(alignment: .leading, spacing: 1) {
-                    readout
-                    buttons
+        .padding(2)
+        .frame(maxHeight: .infinity)
+        .background(BreezePilotPalette.ice, in: RoundedRectangle(cornerRadius: 9))
+    }
+
+    private func stepReadout(_ kind: StepKind, value: String?) -> some View {
+        HStack(spacing: compact ? 2 : 5) {
+            Image(systemName: kind.icon)
+                .font(.system(size: compact ? 9 : 13))
+                .foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 0) {
+                if !compact {
+                    Text(kind.shortTitle)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
-            } else {
-                HStack {
-                    readout
-                    Spacer(minLength: 4)
-                    buttons
-                }
+                Text(value ?? "—")
+                    .font(.system(size: compact ? 11 : style == .featured ? 24 : 15, weight: .semibold))
+                    .monospacedDigit()
+                    .foregroundStyle(value == nil ? Color.secondary : Color.primary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .transition(.identity)
             }
         }
+        .frame(minWidth: compact ? nil : 104, alignment: compact ? .center : .leading)
+        .frame(width: compact ? 41 : nil)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(kind.title))
+        .accessibilityValue(value ?? "Unavailable")
     }
 
     @ViewBuilder
@@ -276,10 +318,14 @@ private struct ACWidgetTile: View {
     ) -> some View {
         let symbol = direction < 0 ? "minus" : "plus"
         let icon = Image(systemName: symbol)
-            .font(.system(size: compact ? 14 : 16, weight: .semibold))
-            .frame(width: compact ? nil : 44, height: compact ? 30 : 41)
-            .frame(maxWidth: compact ? .infinity : nil)
-            .modifier(ACOptionAppearance(selected: false, available: intent != nil, cornerRadius: 9))
+            .font(.system(size: compact ? 13 : 17, weight: .semibold))
+            .foregroundStyle(BreezePilotPalette.accent.opacity(intent == nil ? 0.4 : 1))
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background {
+                if intent != nil {
+                    RoundedRectangle(cornerRadius: 7).fill(BreezePilotPalette.surface)
+                }
+            }
         if let intent {
             Button(intent: intent) {
                 icon.contentShape(Rectangle())

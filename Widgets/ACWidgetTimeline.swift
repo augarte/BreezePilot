@@ -5,21 +5,24 @@ struct ACWidgetEntry: TimelineEntry {
     let readings: [ACWidgetReading]
     var hasSavedUnits = true
 
-    static func sample(count: Int, isOn: Bool = true, isAvailable: Bool = true) -> Self {
-        let samples = [
-            WidgetAC(unit: SavedAC(name: "Living Room AC"), roomName: "Living Room"),
-            WidgetAC(unit: SavedAC(name: "Bedroom AC"), roomName: "Bedroom"),
-            WidgetAC(unit: SavedAC(name: "Office AC"), roomName: "Office"),
-            WidgetAC(unit: SavedAC(name: "Guest Room AC"), roomName: "Guest Room")
+    static func sample(count: Int, isOn: Bool = true, isAvailable: Bool = true,
+                       includesPoweredOffUnit: Bool = false) -> Self {
+        let samples: [(room: String, target: Int, fan: FanSpeed)] = [
+            ("Living Room", 48, .two),
+            ("Bedroom", 47, .one),
+            ("Office", 50, .three),
+            ("Guest Room", 48, .four)
         ]
-        let readings = samples.prefix(count).map {
-            ACWidgetReading(
-                unit: AirConditionerEntity($0),
+        let readings = samples.prefix(count).enumerated().map { index, sample in
+            let unit = WidgetAC(unit: SavedAC(name: "\(sample.room) AC"), roomName: sample.room)
+            return ACWidgetReading(
+                unit: AirConditionerEntity(unit),
                 status: isAvailable
-                    ? ACStatus(isOn: isOn, mode: .cool, availableModes: [.cool],
-                               room: RoomConditions(temperature: nil, humidity: nil),
-                               target: 48, limits: 36...60,
-                               fan: ACFan(selected: .two, available: FanSpeed.daikin),
+                    ? ACStatus(isOn: isOn && !(includesPoweredOffUnit && index == 2),
+                               mode: .cool, availableModes: [.cool],
+                               room: RoomConditions(temperature: 26, humidity: 55),
+                               target: sample.target, limits: 36...60,
+                               fan: ACFan(selected: sample.fan, available: FanSpeed.daikin),
                                features: ACFeatures(boost: nil, econo: nil, streamer: nil))
                     : nil
             )

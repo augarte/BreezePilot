@@ -35,13 +35,13 @@ import WidgetKit
 #Preview("Large · 3 ACs", as: .systemLarge) {
     BreezePilotWidget()
 } timeline: {
-    ACWidgetEntry.sample(count: 3)
+    ACWidgetEntry.sample(count: 3, includesPoweredOffUnit: true)
 }
 
 #Preview("Large · 4 ACs", as: .systemLarge) {
     BreezePilotWidget()
 } timeline: {
-    ACWidgetEntry.sample(count: 4)
+    ACWidgetEntry.sample(count: 4, includesPoweredOffUnit: true)
 }
 
 #Preview("Small · Off and unavailable", as: .systemSmall) {
