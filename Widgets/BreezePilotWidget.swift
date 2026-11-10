@@ -20,6 +20,7 @@ struct BreezePilotWidget: Widget {
         .configurationDisplayName("Air Conditioners")
         .description("See and control your saved air conditioners.")
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
+        .containerBackgroundRemovable(false)
         .contentMarginsDisabled()
     }
 }

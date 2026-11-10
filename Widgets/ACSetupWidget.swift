@@ -12,6 +12,7 @@ struct ACSetupWidget: Widget {
         .configurationDisplayName("AC Scenes")
         .description("Run saved air conditioner scenes from your Home Screen.")
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
+        .containerBackgroundRemovable(false)
         .contentMarginsDisabled()
     }
 }
