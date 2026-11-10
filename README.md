@@ -18,6 +18,7 @@ BreezePilot is an open source **iPhone AC remote and Home Screen widget** for co
 - Adjust power, temperature, mode, and fan speed. See room temperature and humidity when your unit reports them. Some models also expose Boost, Econo, Streamer, or Eco mode.
 - Use the **Air Conditioners** Home Screen widget to see status and adjust power, temperature, and fan speed. Use its round refresh button to request a new reading.
 - Add **Set AC Power** and **Set AC Temperature** to a shortcut in Apple Shortcuts.
+- Save **Scenes** to apply settings across multiple ACs with one tap.
 
 ## Compatibility
 
@@ -61,6 +62,12 @@ Add **Air Conditioners** from the iPhone widget gallery. Touch and hold the widg
 | Large | 1 to 4 |
 
 If an AC shows **Unavailable**, try the round refresh button. If it still fails, check that the phone and AC can reach each other over Wi-Fi and that **Local Network** access is enabled for BreezePilot.
+
+## Create a scene
+
+In **Scenes**, create a scene, give it a name, and add the ACs you want to control. Choose each AC’s desired power, mode, temperature, and fan speed, or leave individual settings as they are. For example, **Sleep** can turn off a living room AC and set a bedroom AC to Cool at 26°C.
+
+Tap the play button to apply the scene. The result shows which ACs responded and lets you retry failed units. Add the **AC Scenes** Home Screen widget and select one, two, or up to four scenes depending on the size. You can also use **Run AC Scene** in Apple Shortcuts.
 
 ## Develop and contribute
 

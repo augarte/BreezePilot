@@ -5,6 +5,7 @@ struct PrivacyPolicyView: View {
         Form {
             Section("Data on your iPhone") {
                 Text("BreezePilot stores your AC and room names, local addresses, model information, and preferences in the app. iOS manages backups of app data.")
+                Text("Saved scenes and their latest run results stay on your iPhone and are shared with the BreezePilot widgets.")
                 Text("Xiaomi device tokens are stored in this iPhone’s Keychain. BreezePilot uses them to authenticate directly to the AC.")
             }
 

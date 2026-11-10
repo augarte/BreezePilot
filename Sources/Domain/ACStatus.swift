@@ -34,6 +34,7 @@ struct ACStatus: Sendable {
     var targetModes: Set<ClimateMode> = [.cool]
     var powerWritable = true
     var usesDeviceOptions = false
+    var fanOptionsByMode: [ClimateMode: [FanSpeed]] = [:]
 
     var isTemperatureMode: Bool { mode.map { targetModes.contains($0) } ?? false }
 

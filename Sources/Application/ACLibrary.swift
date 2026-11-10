@@ -26,9 +26,11 @@ final class ACLibrary {
     }
 
     private static let storageKey = "acLibrary"
+    private static let setupsKey = "acSetups"
     private let defaults: UserDefaults
     private var state: SavedState
     private(set) var selectedUnitID: UUID?
+    private(set) var setups: [ACSetup]
 
     var units: [SavedAC] { state.units }
     var rooms: [ACRoom] { state.rooms }
@@ -47,6 +49,8 @@ final class ACLibrary {
         fallbackAddress: String? = ProcessInfo.processInfo.environment["DAIKIN_ADDRESS"]
     ) {
         self.defaults = defaults
+        setups = defaults.data(forKey: Self.setupsKey)
+            .flatMap { try? JSONDecoder().decode([ACSetup].self, from: $0) } ?? []
         if let data = defaults.data(forKey: Self.storageKey),
            let saved = try? JSONDecoder().decode(SavedState.self, from: data) {
             state = saved
@@ -91,6 +95,39 @@ final class ACLibrary {
         state.units.removeAll { $0.id == id }
         if selectedUnitID == id { selectedUnitID = nil }
         persist()
+    }
+
+    @discardableResult
+    func saveSetup(_ draft: ACSetup) -> Bool {
+        guard draft.canSave else { return false }
+        var setup = draft
+        setup.name = setup.name.trimmingCharacters(in: .whitespacesAndNewlines)
+        setup.revision = UUID()
+        for index in setup.targets.indices {
+            let id = setup.targets[index].id
+            if let unit = units.first(where: { $0.id == id }) {
+                setup.targets[index].unitName = unit.name
+            }
+            setup.targets[index].discardSettingsWhenOff()
+        }
+        if let index = setups.firstIndex(where: { $0.id == setup.id }) {
+            setups[index] = setup
+        } else {
+            setups.append(setup)
+        }
+        persistSetups()
+        return true
+    }
+
+    func removeSetup(_ id: UUID) {
+        setups.removeAll { $0.id == id }
+        persistSetups()
+    }
+
+    private func persistSetups() {
+        if let data = try? JSONEncoder().encode(setups) {
+            defaults.set(data, forKey: Self.setupsKey)
+        }
     }
 
     func hasRoom(named name: String, except id: UUID) -> Bool {

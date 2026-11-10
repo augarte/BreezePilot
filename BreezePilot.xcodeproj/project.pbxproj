@@ -77,6 +77,8 @@
 				Presentation/ACListView.swift,
 				Presentation/ACListViewModel.swift,
 				Presentation/ACOptionControls.swift,
+				Presentation/ACSetupEditor.swift,
+				Presentation/ACSetupsView.swift,
 				Presentation/ACTemperatureCard.swift,
 				Presentation/BreezeIllustration.swift,
 				Presentation/ConnectionView.swift,

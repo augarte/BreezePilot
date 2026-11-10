@@ -46,9 +46,13 @@ struct DaikinClient: ACDevice {
             streamer: indoorOptions?.child("p_20")?.flag
         )
 
+        let fanOptions = Dictionary(uniqueKeysWithValues: availableModes.compactMap { mode in
+            readFan(mode: mode, settings: settings).map { (mode, $0.available) }
+        })
         return ACStatus(
             isOn: power == "01", mode: mode, availableModes: availableModes, room: room, target: target,
-            limits: limits, fan: readFan(mode: mode, settings: settings), features: features
+            limits: limits, fan: readFan(mode: mode, settings: settings), features: features,
+            fanOptionsByMode: fanOptions
         )
     }
 

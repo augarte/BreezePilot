@@ -35,10 +35,8 @@ struct ControlView: View {
                     .disabled(viewModel.isUpdating)
             }
         }
-        .onChange(of: scenePhase, initial: true) { _, phase in
-            if phase == .active && !showingConnection {
-                Task { await viewModel.refresh() }
-            }
+        .task(id: scenePhase) {
+            if scenePhase == .active && !showingConnection { await viewModel.refresh() }
         }
         .sheet(isPresented: $showingConnection, onDismiss: {
             Task { await viewModel.refresh() }

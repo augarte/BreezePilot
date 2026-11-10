@@ -3,6 +3,13 @@ import SwiftUI
 import WidgetKit
 
 @main
+struct BreezePilotWidgets: WidgetBundle {
+    var body: some Widget {
+        BreezePilotWidget()
+        ACSetupWidget()
+    }
+}
+
 struct BreezePilotWidget: Widget {
     var body: some WidgetConfiguration {
         AppIntentConfiguration(kind: ACWidgetStore.kind, intent: ACWidgetConfiguration.self,

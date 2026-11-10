@@ -14,9 +14,12 @@ struct ApplyACChange: Sendable {
 
     func callAsFunction(_ change: ACChange) async throws -> Result {
         // Daikin writes several settings together. Serialize each unit’s read, write, and readback.
-        let lock = try acquireLock()
-        defer { if let lock { close(lock) } }
+        try await ACCommandLock.withLock(unitID?.uuidString) {
+            try await apply(change)
+        }
+    }
 
+    private func apply(_ change: ACChange) async throws -> Result {
         let fresh = try await device.readStatus()
         if change.isConfirmed(by: fresh) { return Result(status: fresh) }
         if let message = change.rejection(in: fresh) {
@@ -42,17 +45,20 @@ struct ApplyACChange: Sendable {
         try Task.checkCancellation()
         return Result(status: latest, message: ACDeviceError.unconfirmed.localizedDescription)
     }
+}
 
-    private func acquireLock() throws -> Int32? {
-        guard let unitID, let container = ACWidgetStore.container else { return nil }
-        let url = container.appendingPathComponent("\(unitID.uuidString).lock")
+enum ACCommandLock {
+    static func withLock<Value>(_ key: String?, operation: () async throws -> Value) async throws -> Value {
+        try Task.checkCancellation()
+        guard let key, let container = ACWidgetStore.container else { return try await operation() }
+        let url = container.appendingPathComponent("\(key).lock")
         let descriptor = open(url.path, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR)
         guard descriptor >= 0 else { throw ACDeviceError.commandInProgress }
+        defer { close(descriptor) }
         guard flock(descriptor, LOCK_EX | LOCK_NB) == 0 else {
-            close(descriptor)
             throw ACDeviceError.commandInProgress
         }
-        return descriptor
+        return try await operation()
     }
 }
 

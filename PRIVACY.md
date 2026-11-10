@@ -4,7 +4,7 @@ BreezePilot does not use advertising, analytics, or tracking. It does not requir
 
 ## Data on your iPhone
 
-BreezePilot stores saved AC and room names, local IP addresses, model information, and preferences on the iPhone. It shares the saved AC details with its widget through an iOS App Group. Xiaomi device tokens are stored in the iPhone’s Keychain and used to authenticate to the AC. iOS manages backups of app data.
+BreezePilot stores saved AC and room names, local IP addresses, model information, preferences, and saved scenes on the iPhone. It shares saved AC details, scene settings, and the latest scene results with its widgets through an iOS App Group. Xiaomi device tokens are stored in the iPhone’s Keychain and used to authenticate to the AC. iOS manages backups of app data.
 
 ## Network connections
 
