@@ -1,8 +1,16 @@
-# BreezePilot
+# BreezePilot — iPhone AC Remote
+
+<img src="docs/images/breezepilot-banner.png" width="720" alt="BreezePilot app icon and the tagline Your AC, one tap away">
 
 **Your AC, one tap away.** Switch your air conditioner on or off, set the temperature, and adjust the fan right from your iPhone’s Home Screen.
 
-BreezePilot is an open source iPhone remote for compatible Daikin and Xiaomi / Mijia air conditioners. It talks directly to your AC over your home network. Once installed, it runs on your iPhone without a Mac or a BreezePilot account.
+BreezePilot is an open source **iPhone AC remote and Home Screen widget** for compatible Daikin and Xiaomi / Mijia Wi-Fi air conditioners. It talks directly to your AC over your home network. Once installed, it runs on your iPhone without a Mac or a BreezePilot account.
+
+[Build and install from source](#install-from-source)
+
+| iPhone controls | Home Screen widget preview |
+| :---: | :---: |
+| <img src="docs/images/ac-controls.png" width="240" alt="BreezePilot control screen showing a simulated AC set to 24 degrees Celsius, with power, temperature, and fan controls"> | <img src="docs/images/ac-widget.png" width="300" alt="Large Air Conditioners widget preview showing four simulated ACs with power, temperature, and fan controls"> |
 
 ## What you can do
 
@@ -15,14 +23,18 @@ BreezePilot is an open source iPhone remote for compatible Daikin and Xiaomi / M
 
 | Brand | What you need |
 | --- | --- |
-| Daikin | A unit that supports the local `/dsiot/multireq` interface. BreezePilot was developed with the Daikin FTKM-YV2S. |
+| Daikin | A unit that supports the local `/dsiot/multireq` interface. |
 | Xiaomi / Mijia | A compatible MIoT air conditioner and its 32-character hexadecimal device token. Setup fetches the model’s public specification. |
 
-BreezePilot targets **iPhone with iOS 17 or later**. Your phone must be able to reach the AC’s local IPv4 address over Wi-Fi. Models and firmware vary in the controls they expose. If you try another model, [share what works](https://github.com/augarte/BreezePilot/issues).
+BreezePilot targets **iPhone with iOS 17 or later**. Your phone must be able to reach the AC’s local IPv4 address over Wi-Fi. Models and firmware vary in the controls they expose. If you try a model, [share what works](https://github.com/augarte/BreezePilot/issues).
+
+### Can I use BreezePilot instead of the Daikin or Xiaomi Home app?
+
+You can use BreezePilot for everyday controls once a compatible AC is on your Wi-Fi. Daikin ONECTA or Xiaomi Home (Mi Home) support alone does not establish compatibility. Check the local interface or token requirement above. Xiaomi setup fetches public model information, and everyday commands go directly to the AC.
 
 ## Install from source
 
-1. Clone the repository and open `BreezePilot.xcodeproj` in Xcode. The project uses Swift 6 and was verified with Xcode 27.2.
+1. Clone the repository and open `BreezePilot.xcodeproj` in an Xcode version that supports Swift 6.
    ```sh
    git clone https://github.com/augarte/BreezePilot.git
    cd BreezePilot
