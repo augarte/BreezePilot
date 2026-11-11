@@ -13,12 +13,14 @@ struct ACWidgetTemperatureEditsTests {
         for _ in 0..<6 {
             try edits.enqueue(for: unit, previous: 52, target: 53, mode: .cool, limits: 36...60)
         }
+        #expect(edits.pendingTarget(for: unit) == 58)
         #expect(await device.writes.isEmpty)
 
         let status = await edits.applyPending(for: unit, device: device, waitForReadback: {})
 
         #expect(status?.target == 58)
         #expect(await device.writes == [58])
+        #expect(edits.pendingTarget(for: unit) == nil)
         #expect(await edits.applyPending(for: unit, device: device, waitForReadback: {}) == nil)
     }
 
@@ -87,6 +89,31 @@ struct ACWidgetTemperatureEditsTests {
 
         #expect(status?.target == 55)
         #expect(await device.writes == [53, 55])
+    }
+
+    @Test func tapsFromAnOptimisticRedrawKeepTheConfirmedDeviceBaseline() async throws {
+        let directory = try makeDirectory()
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let edits = ACWidgetTemperatureEdits(directory: directory, quietPeriod: 0)
+        let unit = UUID()
+        let device = TemperatureDevice(target: 52)
+        try edits.enqueue(for: unit, previous: 52, target: 53, mode: .cool, limits: 36...60)
+        try edits.enqueue(for: unit, previous: 53, target: 54, mode: .cool,
+                          limits: 36...60, observedAt: .now, confirmedTarget: 52)
+
+        #expect(edits.pendingTarget(for: unit) == 54)
+        #expect(!edits.needsTimelineWrite(for: unit))
+        edits.handOffToTimeline(for: unit)
+        #expect(edits.needsTimelineWrite(for: unit))
+
+        let status = await edits.applyPending(for: unit, device: device, waitForReadback: {})
+        #expect(status?.target == 54)
+        #expect(await device.writes == [54])
+        #expect(!edits.needsTimelineWrite(for: unit))
+
+        try edits.enqueue(for: unit, previous: 54, target: 55, mode: .cool, limits: 36...60)
+        #expect(edits.pendingTarget(for: unit) == 55)
+        #expect(!edits.needsTimelineWrite(for: unit))
     }
 
     private func makeDirectory() throws -> URL {

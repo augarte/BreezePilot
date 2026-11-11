@@ -100,11 +100,12 @@ struct AdjustACWidgetTemperatureIntent: AppIntent {
     @Parameter(title: "Minimum Target") var minimum: Int?
     @Parameter(title: "Maximum Target") var maximum: Int?
     @Parameter(title: "Reading Date") var observedAt: Date?
+    @Parameter(title: "Confirmed Target") var confirmed: Int?
 
     init() {}
 
     init(unit: AirConditionerEntity, target: Int, previous: Int, mode: ClimateMode,
-         limits: ClosedRange<Int>, observedAt: Date) {
+         limits: ClosedRange<Int>, observedAt: Date, confirmed: Int) {
         self.unit = unit
         self.target = target
         self.previous = previous
@@ -112,6 +113,7 @@ struct AdjustACWidgetTemperatureIntent: AppIntent {
         self.minimum = limits.lowerBound
         self.maximum = limits.upperBound
         self.observedAt = observedAt
+        self.confirmed = confirmed
     }
 
     func perform() async throws -> some IntentResult {
@@ -129,10 +131,17 @@ struct AdjustACWidgetTemperatureIntent: AppIntent {
             guard let directory = ACWidgetStore.container else {
                 throw ACIntentCommand.Failure(message: "BreezePilot couldn’t share this temperature change with the widget.")
             }
-            try ACWidgetTemperatureEdits(directory: directory).enqueue(
+            guard let saved = ACWidgetStore.catalog.first(where: { $0.unit.id == unit.id })?.unit,
+                  let address = LocalAddress(saved.address) else {
+                throw ACIntentCommand.Failure(message: "Choose an air conditioner saved in BreezePilot.")
+            }
+            let edits = ACWidgetTemperatureEdits(directory: directory)
+            try edits.enqueue(
                 for: unit.id, previous: previous, target: target, mode: climateMode,
-                limits: minimum...maximum, observedAt: observedAt ?? .distantPast
+                limits: minimum...maximum, observedAt: observedAt ?? .distantPast,
+                confirmedTarget: confirmed
             )
+            ACWidgetTemperatureActivity.schedule(unit: saved, address: address, edits: edits)
         } catch is CancellationError {
             throw CancellationError()
         } catch {
@@ -199,6 +208,7 @@ private enum ACIntentCommand {
             let device = ACDevices.local.make(unit, address)
             let command = try await change(device)
             let result = try await ApplyACChange(device: device, unitID: id)(command)
+            ACWidgetStore.cacheStatus(result.status, for: id)
             if let message = result.message { throw Failure(message: message) }
             ACWidgetStore.recordFailure(nil, for: id)
         } catch is CancellationError {

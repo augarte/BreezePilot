@@ -60,6 +60,32 @@ enum ACWidgetStore {
         WidgetCenter.shared.reloadTimelines(ofKind: kind)
     }
 
+    struct StatusSnapshot: Codable {
+        let status: ACStatus
+        let observedAt: Date
+    }
+
+    static func cachedStatus(for id: UUID) -> StatusSnapshot? {
+        guard let url = statusURL(for: id), let data = try? Data(contentsOf: url),
+              let snapshot = try? JSONDecoder().decode(StatusSnapshot.self, from: data),
+              Date.now.timeIntervalSince(snapshot.observedAt) < 1_200 else { return nil }
+        return snapshot
+    }
+
+    static func cacheStatus(_ status: ACStatus?, for id: UUID, observedAt: Date = .now) {
+        guard let url = statusURL(for: id) else { return }
+        if let status {
+            let snapshot = StatusSnapshot(status: status, observedAt: observedAt)
+            try? JSONEncoder().encode(snapshot).write(to: url, options: .atomic)
+        } else {
+            try? FileManager.default.removeItem(at: url)
+        }
+    }
+
+    private static func statusURL(for id: UUID) -> URL? {
+        container?.appendingPathComponent("\(id.uuidString).status.json")
+    }
+
     static func lastFailure(for id: UUID) -> String? {
         guard let url = failureURL(for: id), let data = try? Data(contentsOf: url),
               let failure = try? JSONDecoder().decode(Failure.self, from: data),

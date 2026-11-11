@@ -21,7 +21,7 @@ struct LocalAddress: Equatable, Sendable {
     }
 }
 
-struct ACStatus: Sendable {
+struct ACStatus: Codable, Sendable {
     static let temperatureEditDelay: TimeInterval = 0.75
 
     let isOn: Bool
@@ -61,7 +61,7 @@ struct ACStatus: Sendable {
     }
 }
 
-struct RoomConditions: Sendable {
+struct RoomConditions: Codable, Sendable {
     let temperature: Int?
     let humidity: Int?
 
@@ -95,7 +95,7 @@ enum FanSpeed: String, CaseIterable, Codable, Sendable {
     var label: String { rawValue }
 }
 
-struct ACFan: Sendable {
+struct ACFan: Codable, Sendable {
     let selected: FanSpeed?
     let available: [FanSpeed]
 }
@@ -106,7 +106,7 @@ enum SpecialOperation: String, CaseIterable, Sendable {
     case econo = "Econo"
 }
 
-struct ACFeatures: Sendable {
+struct ACFeatures: Codable, Sendable {
     let boost: Bool?
     let econo: Bool?
     let streamer: Bool?

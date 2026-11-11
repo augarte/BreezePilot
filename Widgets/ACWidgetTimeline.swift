@@ -36,6 +36,7 @@ struct ACWidgetReading: Identifiable {
     let status: ACStatus?
     var failure: String?
     var observedAt = Date.now
+    var pendingTemperature: Int?
 
     var id: UUID { unit.id }
 }
@@ -63,24 +64,35 @@ struct ACWidgetTimeline: AppIntentTimelineProvider {
     private func entry(for configuration: ACWidgetConfiguration, family: WidgetFamily) async -> ACWidgetEntry {
         let catalog = ACWidgetStore.catalog
         let units = configuration.units(in: family, catalog: catalog)
+        let edits = ACWidgetStore.container.map { ACWidgetTemperatureEdits(directory: $0) }
+        let updatingTemperature = units.contains { edits?.pendingTarget(for: $0.unit.id) != nil }
         let readings = await withTaskGroup(of: (Int, ACWidgetReading).self) { group in
             for (index, item) in units.enumerated() {
                 group.addTask {
+                    let id = item.unit.id
                     let status: ACStatus?
-                    if let address = LocalAddress(item.unit.address) {
+                    let observedAt: Date
+                    if updatingTemperature, edits?.needsTimelineWrite(for: id) != true,
+                       let cached = ACWidgetStore.cachedStatus(for: id) {
+                        status = cached.status
+                        observedAt = cached.observedAt
+                    } else if let address = LocalAddress(item.unit.address) {
                         let device = ACDevices.local.make(item.unit, address)
-                        if let directory = ACWidgetStore.container,
-                           let updated = await ACWidgetTemperatureEdits(directory: directory)
-                            .applyPending(for: item.unit.id, device: device) {
+                        if let edits, edits.needsTimelineWrite(for: id),
+                           let updated = await edits.applyPending(for: id, device: device) {
                             status = updated
                         } else {
                             status = try? await device.readStatus()
                         }
+                        observedAt = .now
+                        ACWidgetStore.cacheStatus(status, for: id, observedAt: observedAt)
                     } else {
                         status = nil
+                        observedAt = .now
                     }
                     let reading = ACWidgetReading(unit: AirConditionerEntity(item), status: status,
-                                                  failure: ACWidgetStore.lastFailure(for: item.unit.id))
+                                                  failure: ACWidgetStore.lastFailure(for: id), observedAt: observedAt,
+                                                  pendingTemperature: edits?.pendingTarget(for: id))
                     return (index, reading)
                 }
             }

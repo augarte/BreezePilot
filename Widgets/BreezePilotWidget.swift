@@ -290,7 +290,8 @@ private struct ACWidgetTile: View {
     }
 
     private func stepReadout(_ kind: StepKind, value: String?) -> some View {
-        HStack(spacing: compact ? 2 : 5) {
+        let isPending = kind == .temperature && reading.pendingTemperature != nil && value != nil
+        return HStack(spacing: compact ? 2 : 5) {
             Image(systemName: kind.icon)
                 .font(.system(size: compact ? 9 : 13))
                 .foregroundStyle(.secondary)
@@ -305,7 +306,7 @@ private struct ACWidgetTile: View {
                 Text(value ?? "—")
                     .font(.system(size: compact ? 11 : style == .featured ? 24 : 15, weight: .semibold))
                     .monospacedDigit()
-                    .foregroundStyle(value == nil ? Color.secondary : Color.primary)
+                    .foregroundStyle(isPending ? BreezePilotPalette.accent : value == nil ? .secondary : .primary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
                     .transition(.identity)
@@ -315,7 +316,7 @@ private struct ACWidgetTile: View {
         .frame(width: compact ? 41 : nil)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(kind.title))
-        .accessibilityValue(value ?? "Unavailable")
+        .accessibilityValue(isPending ? "\(value ?? ""), pending" : value ?? "Unavailable")
     }
 
     @ViewBuilder
@@ -354,15 +355,18 @@ private struct ACWidgetTile: View {
     }
 
     private func temperatureValue(_ status: ACStatus) -> String? {
-        guard status.isOn, status.isTemperatureMode, let target = status.target else { return nil }
+        guard status.isOn, status.isTemperatureMode,
+              let target = reading.pendingTemperature ?? status.target else { return nil }
         return "\(ACStatus.degrees(target))°C"
     }
 
     private func temperatureIntent(_ direction: Int, status: ACStatus) -> AdjustACWidgetTemperatureIntent? {
-        guard let previous = status.target, let mode = status.mode, let limits = status.limits,
-              let target = status.adjusted(by: direction) else { return nil }
+        guard let confirmed = status.target, let mode = status.mode, let limits = status.limits else { return nil }
+        let previous = reading.pendingTemperature ?? confirmed
+        guard let target = status.adjusted(by: direction, from: previous) else { return nil }
         return AdjustACWidgetTemperatureIntent(unit: reading.unit, target: target, previous: previous,
-                                               mode: mode, limits: limits, observedAt: reading.observedAt)
+                                               mode: mode, limits: limits, observedAt: reading.observedAt,
+                                               confirmed: confirmed)
     }
 
     private func fanIntent(_ direction: Int, status: ACStatus) -> SetACWidgetFanSpeedIntent? {
