@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import OSLog
 
 struct SavedAC: Codable, Identifiable, Hashable, Sendable {
     var id = UUID()
@@ -49,10 +50,8 @@ final class ACLibrary {
         fallbackAddress: String? = ProcessInfo.processInfo.environment["DAIKIN_ADDRESS"]
     ) {
         self.defaults = defaults
-        setups = defaults.data(forKey: Self.setupsKey)
-            .flatMap { try? JSONDecoder().decode([ACSetup].self, from: $0) } ?? []
-        if let data = defaults.data(forKey: Self.storageKey),
-           let saved = try? JSONDecoder().decode(SavedState.self, from: data) {
+        setups = Self.load([ACSetup].self, forKey: Self.setupsKey, from: defaults) ?? []
+        if let saved = Self.load(SavedState.self, forKey: Self.storageKey, from: defaults) {
             state = saved
             if saved.restoresScreen {
                 selectedUnitID = saved.units.first { $0.id == saved.lastUnitID }?.id
@@ -69,6 +68,23 @@ final class ACLibrary {
             persist()
         }
         defaults.removeObject(forKey: "acAddress")
+    }
+
+    /// Suffix of the key that keeps saved data this version couldn't read.
+    static let unreadableSuffix = ".unreadable"
+
+    /// Reads a saved value. Data that exists but can't be decoded is copied aside first, because the
+    /// library starts from defaults in that case and its next save would otherwise destroy the original.
+    private static func load<Value: Decodable>(_ type: Value.Type, forKey key: String, from defaults: UserDefaults) -> Value? {
+        guard let data = defaults.data(forKey: key) else { return nil }
+        do {
+            return try JSONDecoder().decode(type, from: data)
+        } catch {
+            defaults.set(data, forKey: key + unreadableSuffix)
+            Logger(subsystem: "local.daikin.directcontrol", category: "Library")
+                .error("Could not read \(key, privacy: .public); kept a copy: \(error.localizedDescription, privacy: .private)")
+            return nil
+        }
     }
 
     func select(_ id: UUID?) {

@@ -122,10 +122,17 @@ final class ACControlViewModel {
             ACWidgetStore.recordFailure(nil, for: unitID)
             ACWidgetStore.reload()
         } catch is CancellationError {
-            status = nil
+            // Interrupted, not refused. Keep showing the last status.
         } catch {
-            status = nil
-            message = error.localizedDescription
+            // A change can fail while the AC is still reachable, for example when a widget is writing to it.
+            // Only fall back to the unavailable screen when the AC really can't be read.
+            let failure = error.localizedDescription
+            if let fresh = try? await device.readStatus() {
+                receive(fresh)
+            } else {
+                status = nil
+            }
+            message = failure
         }
     }
 

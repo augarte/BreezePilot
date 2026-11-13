@@ -68,6 +68,21 @@ struct ACLibraryTests {
         }
     }
 
+    @Test func keepsACopyOfSavedDataItCannotRead() throws {
+        let unreadable = Data("{\"units\": \"not a list\"}".utf8)
+        try withLibrary(prepare: {
+            $0.set(unreadable, forKey: "acLibrary")
+            $0.set(unreadable, forKey: "acSetups")
+        }) { library, defaults in
+            #expect(library.units.isEmpty)
+            #expect(library.setups.isEmpty)
+            // Starting over rewrites the main key, so the original has to survive somewhere else.
+            #expect(defaults.data(forKey: "acLibrary") != unreadable)
+            #expect(defaults.data(forKey: "acLibrary" + ACLibrary.unreadableSuffix) == unreadable)
+            #expect(defaults.data(forKey: "acSetups" + ACLibrary.unreadableSuffix) == unreadable)
+        }
+    }
+
     private func withLibrary(
         prepare: (UserDefaults) -> Void = { _ in },
         _ test: (ACLibrary, UserDefaults) throws -> Void
