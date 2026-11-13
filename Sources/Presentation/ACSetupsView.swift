@@ -7,6 +7,7 @@ struct ACSetupsView: View {
     @State private var results: [UUID: ACSetupRunResult] = [:]
     @State private var runError: String?
     @Binding var requestedSetupID: UUID?
+    @Binding var addingScene: Bool
     let library: ACLibrary
     let devices: ACDevices
 
@@ -29,14 +30,12 @@ struct ACSetupsView: View {
                     emptyState
                 } else {
                     ScrollView {
-                        LazyVStack(spacing: 10) {
+                        LazyVStack(spacing: BreezeMetrics.cardSpacing) {
                             ForEach(library.setups) { setup in
                                 setupCard(setup)
                             }
                         }
-                        .frame(maxWidth: 520)
-                        .padding(16)
-                        .frame(maxWidth: .infinity)
+                        .breezePage()
                     }
                 }
             }
@@ -45,9 +44,7 @@ struct ACSetupsView: View {
             .navigationTitle("Scenes")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Add Scene", systemImage: "plus") { sheet = .editor(ACSetup()) }
-                        .labelStyle(.iconOnly)
-                        .disabled(library.units.isEmpty || runningID != nil)
+                    ProfileToolbarButton(library: library).labelStyle(.iconOnly)
                 }
             }
             .sheet(item: $sheet) { item in
@@ -76,6 +73,11 @@ struct ACSetupsView: View {
                     sheet = .editor(setup)
                 }
             }
+            .onChange(of: addingScene) { _, adding in
+                guard adding else { return }
+                addingScene = false
+                if runningID == nil { sheet = .editor(ACSetup()) }
+            }
             .onChange(of: scenePhase, initial: true) { _, phase in
                 if phase == .active {
                     for setup in library.setups {
@@ -87,41 +89,31 @@ struct ACSetupsView: View {
     }
 
     private var emptyState: some View {
-        VStack(spacing: 10) {
-            Image(systemName: "square.stack")
-                .font(.system(size: 34, weight: .medium))
-                .foregroundStyle(BreezePilotPalette.accent)
-            Text("No scenes yet").font(.title3.weight(.semibold))
-            Text(library.units.isEmpty ? "Add an AC in Control to get started."
-                 : "Save settings for multiple ACs and apply them with one tap.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-            if !library.units.isEmpty {
-                Button("New Scene", systemImage: "plus") { sheet = .editor(ACSetup()) }
-                    .buttonStyle(.borderedProminent)
-                    .padding(.top, 3)
-            }
-        }
-        .padding(20)
+        ACEmptyStateView(
+            symbol: "square.stack",
+            title: "No scenes yet",
+            message: Text(library.units.isEmpty ? "Add an AC in Control to get started."
+                          : "Save settings for multiple ACs and apply them with one tap."),
+            primaryAction: library.units.isEmpty ? nil : .init(title: "New Scene") { sheet = .editor(ACSetup()) }
+        )
     }
 
     private func setupCard(_ setup: ACSetup) -> some View {
         let names = Dictionary(library.units.map { ($0.id, $0.name) }, uniquingKeysWith: { first, _ in first })
         let summary = setup.summary(names: names)
-        return HStack(alignment: .center, spacing: 10) {
-            VStack(alignment: .leading, spacing: 6) {
+        return HStack(alignment: .center, spacing: 12) {
+            VStack(alignment: .leading, spacing: 10) {
                 Button { sheet = .editor(setup) } label: {
-                    HStack(spacing: 8) {
+                    HStack(spacing: 12) {
                         Image(systemName: setup.icon.symbol)
-                            .font(.headline)
+                            .font(.title3.weight(.semibold))
                             .foregroundStyle(BreezePilotPalette.accent)
-                            .frame(width: 40, height: 40)
-                            .background(BreezePilotPalette.ice, in: RoundedRectangle(cornerRadius: 11))
-                        VStack(alignment: .leading, spacing: 3) {
+                            .frame(width: BreezeMetrics.cardAccessory, height: BreezeMetrics.cardAccessory)
+                            .background(BreezePilotPalette.ice, in: RoundedRectangle(cornerRadius: BreezeMetrics.tileRadius))
+                        VStack(alignment: .leading, spacing: 4) {
                             Text(setup.name).font(.headline).foregroundStyle(.primary)
                             Text(summary)
-                                .font(.caption)
+                                .font(.subheadline)
                                 .foregroundStyle(.secondary)
                                 .lineLimit(2)
                         }
@@ -139,7 +131,7 @@ struct ACSetupsView: View {
                         sheet = .result(result)
                     } label: {
                         Label(result.summary, systemImage: result.allApplied ? "checkmark.circle" : "exclamationmark.circle")
-                            .font(.caption)
+                            .font(.footnote)
                             .foregroundStyle(result.allApplied ? Color.secondary : .orange)
                     }
                     .buttonStyle(.plain)
@@ -159,18 +151,17 @@ struct ACSetupsView: View {
                             .font(.system(size: 17, weight: .semibold))
                     }
                 }
-                .frame(width: 68, height: 46)
+                .frame(width: BreezeMetrics.cardAccessory, height: BreezeMetrics.cardAccessory)
                 .foregroundStyle(.white)
-                .background(BreezePilotPalette.action, in: RoundedRectangle(cornerRadius: 12))
-                .contentShape(Rectangle())
+                .background(BreezePilotPalette.action, in: Circle())
+                .contentShape(Circle())
             }
             .buttonStyle(.plain)
             .disabled(runningID != nil)
             .opacity(runningID == nil || runningID == setup.id ? 1 : 0.45)
             .accessibilityLabel(runningID == setup.id ? "Running \(setup.name)" : "Run \(setup.name)")
         }
-        .padding(12)
-        .background(BreezePilotPalette.surface, in: RoundedRectangle(cornerRadius: 16))
+        .breezeCard()
     }
 
     private func latestResult(for setup: ACSetup) -> ACSetupRunResult? {

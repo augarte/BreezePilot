@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Resolve simulator destination
+        id: destination
+        run: |
+          name=$(xcrun simctl list devices available iPhone | grep -Eo 'iPhone [0-9]+( Pro Max| Pro| Plus| mini)?' | sort -Vu | tail -1)
+          if [ -z "$name" ]; then
+            echo "No available iPhone simulator found on this runner:" >&2
+            xcrun simctl list devices available >&2
+            exit 1
+          fi
+          echo "Using simulator: $name"
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+
+      - name: Run unit and UI tests
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project BreezePilot.xcodeproj \
+            -scheme BreezePilot \
+            -destination "platform=iOS Simulator,name=${{ steps.destination.outputs.name }}" \
+            -resultBundlePath TestResults.xcresult \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO
+
+      - name: Build widget extension
+        if: always()
+        run: |
+          xcodebuild build \
+            -project BreezePilot.xcodeproj \
+            -scheme BreezePilotWidgets \
+            -destination "platform=iOS Simulator,name=${{ steps.destination.outputs.name }}" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults.xcresult

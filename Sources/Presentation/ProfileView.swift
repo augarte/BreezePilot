@@ -1,13 +1,44 @@
 import SwiftUI
 
-struct LibrarySettingsView: View {
+/// The toolbar button that opens the profile page. Both tabs show it in the same place.
+struct ProfileToolbarButton: View {
+    @State private var showing = false
+    let library: ACLibrary
+
+    var body: some View {
+        Button("Profile", systemImage: "person.crop.circle") { showing = true }
+            .sheet(isPresented: $showing) { ProfileView(library: library) }
+    }
+}
+
+struct ProfileView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var editingRoom: ACRoom?
     @Bindable var library: ACLibrary
 
+    private var summary: String {
+        let acs = library.units.count, rooms = library.rooms.count, scenes = library.setups.count
+        return "\(acs) \(acs == 1 ? "AC" : "ACs") · \(rooms) \(rooms == 1 ? "room" : "rooms") · \(scenes) \(scenes == 1 ? "scene" : "scenes")"
+    }
+
     var body: some View {
         NavigationStack {
             Form {
+                Section {
+                    HStack(spacing: 14) {
+                        Image(systemName: "person.crop.circle.fill")
+                            .font(.system(size: 52))
+                            .foregroundStyle(BreezePilotPalette.accent)
+                            .accessibilityHidden(true)
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text("My Home").font(.title3.weight(.semibold))
+                            Text(summary).font(.subheadline).foregroundStyle(.secondary)
+                        }
+                    }
+                    .padding(.vertical, 4)
+                    .accessibilityElement(children: .combine)
+                }
+
                 Section {
                     Toggle("Reopen Last AC", isOn: $library.restoresScreen)
                 } footer: {
@@ -35,7 +66,7 @@ struct LibrarySettingsView: View {
                     NavigationLink("Privacy Policy") { PrivacyPolicyView() }
                 }
             }
-            .navigationTitle("Settings")
+            .navigationTitle("Profile")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } }

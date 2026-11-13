@@ -49,6 +49,19 @@ struct ACStatus: Codable, Sendable {
         return (target - limits.lowerBound).isMultiple(of: targetStep)
     }
 
+    /// This status with tapped changes already applied, for showing the result before the AC confirms it.
+    /// Anything left nil keeps the AC's own value.
+    func expecting(power: Bool? = nil, target: Int? = nil, fan fanSpeed: FanSpeed? = nil) -> ACStatus {
+        ACStatus(
+            isOn: power ?? isOn, mode: mode, availableModes: availableModes, room: room,
+            target: target ?? self.target, limits: limits,
+            fan: fan.map { ACFan(selected: fanSpeed ?? $0.selected, available: $0.available) },
+            features: features, targetStep: targetStep, targetModes: targetModes,
+            powerWritable: powerWritable, usesDeviceOptions: usesDeviceOptions,
+            fanOptionsByMode: fanOptionsByMode
+        )
+    }
+
     // Integer half-degrees keep target steps exact.
     func adjusted(by delta: Int, from draft: Int? = nil) -> Int? {
         guard canAdjust, let current = draft ?? target, let limits else { return nil }

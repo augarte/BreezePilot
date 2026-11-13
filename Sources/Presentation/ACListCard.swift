@@ -4,9 +4,13 @@ struct ACListCard: View {
     let name: String
     let status: ACStatus?
     let loading: Bool
+    /// Leaves room for the power button the list lays over the card's top trailing corner.
+    var reservesPowerButton = false
+
+    private var active: Bool { status?.isOn == true }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 14) {
             header
 
             if let status, status.isOn {
@@ -19,44 +23,45 @@ struct ACListCard: View {
                     .foregroundStyle(.secondary)
             }
         }
-        .padding(18)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(BreezePilotPalette.surface, in: RoundedRectangle(cornerRadius: 24))
-        .contentShape(RoundedRectangle(cornerRadius: 24))
+        .breezeCard()
+        .contentShape(RoundedRectangle(cornerRadius: BreezeMetrics.cardRadius))
     }
 
     private var header: some View {
         HStack(spacing: 12) {
-            Image(systemName: "snowflake")
+            Image(systemName: status?.mode?.symbol ?? "snowflake")
                 .font(.title3.weight(.semibold))
-                .foregroundStyle(BreezePilotPalette.accent)
-                .frame(width: 46, height: 46)
-                .background(BreezePilotPalette.ice, in: RoundedRectangle(cornerRadius: 14))
+                .foregroundStyle(active ? BreezePilotPalette.accent : Color.secondary)
+                .frame(width: BreezeMetrics.cardAccessory, height: BreezeMetrics.cardAccessory)
+                .background(BreezePilotPalette.ice, in: RoundedRectangle(cornerRadius: BreezeMetrics.tileRadius))
                 .accessibilityHidden(true)
 
-            VStack(alignment: .leading, spacing: 5) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(name)
-                    .font(.title3.weight(.semibold))
+                    .font(.headline)
                     .lineLimit(2)
                 operatingState
             }
             Spacer(minLength: 8)
-            Image(systemName: "chevron.right")
-                .font(.footnote.weight(.semibold))
-                .foregroundStyle(.tertiary)
-                .accessibilityHidden(true)
+            if reservesPowerButton {
+                Color.clear.frame(width: BreezeMetrics.cardAccessory, height: BreezeMetrics.cardAccessory)
+            } else {
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+                    .accessibilityHidden(true)
+            }
         }
     }
 
     private var operatingState: some View {
-        let active = status?.isOn == true
-        return HStack(spacing: 6) {
+        HStack(spacing: 6) {
             Circle()
                 .fill(active ? Color(uiColor: .systemGreen) : Color.secondary)
                 .frame(width: 6, height: 6)
                 .accessibilityHidden(true)
             Text(stateLabel)
-                .font(.caption.weight(.semibold))
+                .font(.subheadline.weight(.medium))
         }
         .foregroundStyle(active ? BreezePilotPalette.accent : Color.secondary)
     }
@@ -88,7 +93,7 @@ struct ACListCard: View {
         if let target {
             ACSettingTile(
                 title: "Set temperature",
-                value: "\(ACStatus.degrees(target)) °C",
+                value: "\(ACStatus.degrees(target))°C",
                 icon: "thermometer.snowflake"
             )
         }
@@ -98,24 +103,65 @@ struct ACListCard: View {
     }
 }
 
+/// Turns one AC on or off straight from the list.
+struct ACListPowerButton: View {
+    let name: String
+    let isOn: Bool
+    let busy: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Group {
+                if busy {
+                    ProgressView().tint(isOn ? Color.white : BreezePilotPalette.accent)
+                } else {
+                    Image(systemName: "power").font(.system(size: 18, weight: .bold))
+                }
+            }
+            .frame(width: BreezeMetrics.cardAccessory, height: BreezeMetrics.cardAccessory)
+            .foregroundStyle(isOn ? Color.white : BreezePilotPalette.accent)
+            .background(isOn ? BreezePilotPalette.action : BreezePilotPalette.ice, in: Circle())
+            .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .disabled(busy)
+        .accessibilityLabel(isOn ? "Turn off \(name)" : "Turn on \(name)")
+        .accessibilityValue(isOn ? "AC is on" : "AC is off")
+    }
+}
+
 private struct ACSettingTile: View {
     let title: String
     let value: String
     let icon: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 5) {
+        VStack(alignment: .leading, spacing: 4) {
             Label(title, systemImage: icon)
                 .font(.caption.weight(.medium))
                 .foregroundStyle(.secondary)
             Text(value)
-                .font(.title2.weight(.semibold))
+                .font(.title3.weight(.semibold))
                 .monospacedDigit()
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(BreezePilotPalette.ice, in: RoundedRectangle(cornerRadius: 14))
+        .background(BreezePilotPalette.ice, in: RoundedRectangle(cornerRadius: BreezeMetrics.tileRadius))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(title), \(value)")
+    }
+}
+
+private extension ClimateMode {
+    var symbol: String {
+        switch self {
+        case .cool: "snowflake"
+        case .heat: "sun.max"
+        case .dry: "drop"
+        case .fan: "fan"
+        case .auto: "arrow.triangle.2.circlepath"
+        case .humidify: "humidity"
+        }
     }
 }

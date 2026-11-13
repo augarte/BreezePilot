@@ -16,7 +16,7 @@ struct PrivacyPolicyView: View {
             }
 
             Section("Manage or remove data") {
-                Text("Use Remove AC to delete a saved AC and its token. You can edit or delete rooms in Settings.")
+                Text("Use Remove AC to delete a saved AC and its token. You can edit or delete rooms in Profile.")
                 Text("You can turn off Local Network access in iPhone Settings. Turn it back on to resume AC control.")
             }
         }

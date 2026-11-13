@@ -9,7 +9,7 @@ final class ACSetupUITests: XCTestCase {
         app.launchArguments = ["-AppleLanguages", "(en)", "-AppleLocale", "en_US"]
         app.launch()
 
-        let scenes = app.tabBars.buttons["Scenes"]
+        let scenes = app.buttons["Scenes"]
         XCTAssertTrue(scenes.waitForExistence(timeout: 8))
         scenes.tap()
         app.buttons["New Scene"].tap()
@@ -39,9 +39,9 @@ final class ACSetupUITests: XCTestCase {
         let run = app.buttons["Run Sleep"]
         XCTAssertTrue(run.waitForExistence(timeout: 8))
         run.tap()
-        let result = app.descendants(matching: .any)["setupRunSummary"].firstMatch
+        // On iOS 26 the identifier lands on the label's icon too, so match the summary text itself.
+        let result = app.staticTexts["1 of 2 ACs updated"]
         XCTAssertTrue(result.waitForExistence(timeout: 12))
-        XCTAssertTrue(result.label.contains("1 of 2 ACs updated"))
-        XCTAssertTrue(app.buttons["Retry Failed ACs"].exists)
+        XCTAssertTrue(app.buttons["Retry Failed ACs"].waitForExistence(timeout: 5))
     }
 }

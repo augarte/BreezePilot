@@ -25,6 +25,65 @@ struct BreezePilotWidget: Widget {
     }
 }
 
+/// Spacing and corner values shared by both widgets. Corners shrink with each level of nesting.
+enum ACWidgetMetrics {
+    static func margin(_ family: WidgetFamily) -> CGFloat { family == .systemSmall ? 8 : 10 }
+    static func spacing(_ family: WidgetFamily) -> CGFloat { family == .systemSmall ? 4 : 6 }
+    static let tileRadius: CGFloat = 14
+    static let compactTileRadius: CGFloat = 12
+    static let controlRadius: CGFloat = 9
+    static let buttonRadius: CGFloat = 7
+}
+
+/// The title row both widgets start with.
+struct ACWidgetHeader<Accessory: View>: View {
+    @Environment(\.widgetFamily) private var family
+    private let title: LocalizedStringKey
+    private let symbol: String
+    private let accessory: Accessory
+
+    init(title: LocalizedStringKey, symbol: String, @ViewBuilder accessory: () -> Accessory = { EmptyView() }) {
+        self.title = title
+        self.symbol = symbol
+        self.accessory = accessory()
+    }
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Label(title, systemImage: symbol)
+                .font((family == .systemSmall ? Font.caption : .subheadline).weight(.semibold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+                .foregroundStyle(BreezePilotPalette.accent)
+            Spacer(minLength: 0)
+            accessory
+        }
+        .padding(.horizontal, 2)
+    }
+}
+
+/// Shown by either widget when it has nothing to list.
+struct ACWidgetEmptyState: View {
+    let symbol: String
+    let title: LocalizedStringKey
+    let message: LocalizedStringKey
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Image(systemName: symbol)
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(BreezePilotPalette.accent)
+            Text(title)
+                .font(.headline)
+            Text(message)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+        .padding(16)
+    }
+}
+
 private struct ACWidgetView: View {
     @Environment(\.widgetFamily) private var family
     let entry: ACWidgetEntry
@@ -36,9 +95,12 @@ private struct ACWidgetView: View {
                     widgetHeader
                     units(first: first)
                 }
-                .padding(family == .systemSmall ? 8 : 10)
+                .padding(ACWidgetMetrics.margin(family))
             } else {
-                emptyState
+                ACWidgetEmptyState(
+                    symbol: "snowflake", title: "Air Conditioners",
+                    message: entry.hasSavedUnits ? "Choose an AC in Edit Widget." : "Add an AC in BreezePilot to get started."
+                )
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -46,21 +108,7 @@ private struct ACWidgetView: View {
         .widgetURL(widgetURL)
     }
 
-    private var spacing: CGFloat { family == .systemSmall ? 4 : 6 }
-
-    private var emptyState: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Image(systemName: "snowflake")
-                .foregroundStyle(.tint)
-            Text("Air Conditioners")
-                .font(.headline)
-            Text(entry.hasSavedUnits ? "Choose an AC in Edit Widget." : "Add an AC in BreezePilot to get started.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .padding(16)
-    }
+    private var spacing: CGFloat { ACWidgetMetrics.spacing(family) }
 
     private var widgetURL: URL? {
         if family == .systemSmall, let reading = entry.readings.first {
@@ -102,17 +150,10 @@ private struct ACWidgetView: View {
 
     private var widgetHeader: some View {
         let small = family == .systemSmall
-        let title: LocalizedStringKey = small ? "BreezePilot" : "Air Conditioners"
-        return HStack(spacing: 4) {
-            Label(title, systemImage: "snowflake")
-                .font((small ? Font.caption : .subheadline).weight(.semibold))
-                .lineLimit(1)
-                .minimumScaleFactor(0.75)
-                .foregroundStyle(BreezePilotPalette.accent)
-            Spacer(minLength: 0)
-            ACWidgetRefreshButton(compact: small)
+        let title: LocalizedStringKey = entry.isRefreshing ? "Refreshing…" : small ? "BreezePilot" : "Air Conditioners"
+        return ACWidgetHeader(title: title, symbol: entry.isRefreshing ? "arrow.triangle.2.circlepath" : "snowflake") {
+            ACWidgetRefreshButton(compact: small, isRefreshing: entry.isRefreshing)
         }
-        .padding(.horizontal, 2)
     }
 
     private func row(_ readings: ArraySlice<ACWidgetReading>) -> some View {
@@ -127,21 +168,23 @@ private struct ACWidgetView: View {
 
 private struct ACWidgetRefreshButton: View {
     let compact: Bool
+    let isRefreshing: Bool
 
     var body: some View {
         let diameter: CGFloat = compact ? 22 : 26
         Button(intent: RefreshACWidgetIntent()) {
-            Image(systemName: "arrow.clockwise")
+            Image(systemName: isRefreshing ? "arrow.triangle.2.circlepath" : "arrow.clockwise")
                 .font(.system(size: compact ? 11 : 13, weight: .semibold))
+                .contentTransition(.symbolEffect(.replace))
                 .invalidatableContent()
-                .foregroundStyle(BreezePilotPalette.accent)
+                .foregroundStyle(isRefreshing ? Color.white : BreezePilotPalette.accent)
                 .frame(width: diameter, height: diameter)
-                .background(BreezePilotPalette.ice, in: Circle())
+                .background(isRefreshing ? BreezePilotPalette.accent : BreezePilotPalette.ice, in: Circle())
                 .frame(width: compact ? 26 : 32, height: diameter)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.borderless)
-        .accessibilityLabel("Refresh air conditioner status")
+        .accessibilityLabel(isRefreshing ? "Refreshing air conditioner status" : "Refresh air conditioner status")
     }
 }
 
@@ -171,7 +214,7 @@ private struct ACWidgetTile: View {
             }
             VStack(alignment: .leading, spacing: style == .featured ? 8 : 4) {
                 header
-                if let status = reading.status {
+                if let status = reading.controlStatus {
                     if style == .featured, status.room.hasReading {
                         RoomConditionsView(conditions: status.room)
                             .font(.caption)
@@ -189,19 +232,33 @@ private struct ACWidgetTile: View {
         }
         .padding(compact ? 4 : 6)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .background(BreezePilotPalette.surface, in: RoundedRectangle(cornerRadius: compact ? 12 : 15))
+        .background(BreezePilotPalette.surface, in: RoundedRectangle(cornerRadius: compact ? ACWidgetMetrics.compactTileRadius : ACWidgetMetrics.tileRadius))
     }
 
     private var header: some View {
         HStack(spacing: 4) {
             name.layoutPriority(1)
-            if let failure = reading.failure {
+            if reading.isApplying && reading.showsProgress {
+                applyingIndicator
+            } else if let failure = reading.failure {
                 Image(systemName: "exclamationmark.circle.fill")
                     .font(.caption2)
                     .foregroundStyle(.orange)
                     .accessibilityLabel(Text(failure))
             }
         }
+    }
+
+    private var applyingIndicator: some View {
+        HStack(spacing: 2) {
+            Image(systemName: "arrow.triangle.2.circlepath")
+                .font(.system(size: 9, weight: .bold))
+            if !compact { Text("Applying…").font(.caption2.weight(.semibold)) }
+        }
+        .foregroundStyle(BreezePilotPalette.accent)
+        .lineLimit(1)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Applying change")
     }
 
     @ViewBuilder
@@ -218,6 +275,9 @@ private struct ACWidgetTile: View {
         }
     }
 
+    /// The power state to show: what was just tapped until the AC confirms or refuses it.
+    private func isOn(_ status: ACStatus) -> Bool { reading.pendingPower ?? status.isOn }
+
     private func controls(_ status: ACStatus) -> some View {
         VStack(spacing: style == .featured ? 7 : 4) {
             stepRow(.temperature,
@@ -225,7 +285,7 @@ private struct ACWidgetTile: View {
                     decrease: temperatureIntent(-1, status: status),
                     increase: temperatureIntent(1, status: status))
             stepRow(.fan,
-                    value: status.isOn ? status.fan?.selected?.label : nil,
+                    value: isOn(status) ? (reading.pendingFan ?? status.fan?.selected)?.label : nil,
                     decrease: fanIntent(-1, status: status),
                     increase: fanIntent(1, status: status))
         }
@@ -234,12 +294,12 @@ private struct ACWidgetTile: View {
     @ViewBuilder
     private func power(_ status: ACStatus) -> some View {
         if status.powerWritable {
-            Button(intent: SetACPowerIntent(unit: reading.unit, isOn: !status.isOn)) {
+            Button(intent: SetACPowerIntent(unit: reading.unit, isOn: !isOn(status))) {
                 powerLabel(status)
             }
             .buttonStyle(.borderless)
-            .accessibilityLabel(status.isOn ? "Turn \(reading.unit.name) off" : "Turn \(reading.unit.name) on")
-            .accessibilityValue(status.isOn ? "AC is on" : "AC is off")
+            .accessibilityLabel(isOn(status) ? "Turn \(reading.unit.name) off" : "Turn \(reading.unit.name) on")
+            .accessibilityValue(reading.pendingPower != nil ? "Applying" : isOn(status) ? "AC is on" : "AC is off")
         } else {
             powerLabel(status)
                 .accessibilityElement(children: .ignore)
@@ -247,20 +307,22 @@ private struct ACWidgetTile: View {
         }
     }
 
-    private func powerLabel(_ status: ACStatus) -> some View {
-        let highlighted = status.isOn && status.powerWritable
+    private func powerLabel(_ status: ACStatus, on: Bool? = nil) -> some View {
+        let on = on ?? isOn(status)
+        let highlighted = on && status.powerWritable
         return VStack(spacing: 3) {
             Image(systemName: "power")
                 .font(.system(size: compact ? 14 : style == .featured ? 23 : 18, weight: .semibold))
-            Text(status.isOn ? "On" : "Off")
+            Text(on ? "On" : "Off")
                 .font(.caption2.weight(.semibold))
                 .transition(.identity)
         }
-        .foregroundStyle(highlighted ? BreezePilotPalette.accent : Color.secondary)
+        // Filled when on, like the power buttons in the app, so the state reads at a glance.
+        .foregroundStyle(highlighted ? Color.white : Color.secondary)
         .frame(width: style.powerWidth)
         .frame(maxHeight: .infinity)
-        .background(highlighted ? BreezePilotPalette.ice : Color.secondary.opacity(0.12),
-                    in: RoundedRectangle(cornerRadius: 9))
+        .background(highlighted ? BreezePilotPalette.action : Color.secondary.opacity(0.12),
+                    in: RoundedRectangle(cornerRadius: ACWidgetMetrics.controlRadius))
         .contentShape(Rectangle())
     }
 
@@ -268,8 +330,7 @@ private struct ACWidgetTile: View {
         case temperature, fan
 
         var icon: String { self == .temperature ? "thermometer.medium" : "fan" }
-        var title: LocalizedStringKey { self == .temperature ? "Target temperature" : "Fan speed" }
-        var shortTitle: LocalizedStringKey { self == .temperature ? "Set temperature" : "Fan speed" }
+        var title: LocalizedStringKey { self == .temperature ? "Set temperature" : "Fan speed" }
     }
 
     private func stepRow<Intent: AppIntent>(
@@ -286,18 +347,18 @@ private struct ACWidgetTile: View {
         .buttonStyle(.plain)
         .padding(2)
         .frame(maxHeight: .infinity)
-        .background(BreezePilotPalette.ice, in: RoundedRectangle(cornerRadius: 9))
+        .background(BreezePilotPalette.ice, in: RoundedRectangle(cornerRadius: ACWidgetMetrics.controlRadius))
     }
 
     private func stepReadout(_ kind: StepKind, value: String?) -> some View {
-        let isPending = kind == .temperature && reading.pendingTemperature != nil && value != nil
+        let isPending = (kind == .temperature ? reading.pendingTemperature != nil : reading.pendingFan != nil) && value != nil
         return HStack(spacing: compact ? 2 : 5) {
             Image(systemName: kind.icon)
                 .font(.system(size: compact ? 9 : 13))
                 .foregroundStyle(.secondary)
             VStack(alignment: .leading, spacing: 0) {
                 if !compact {
-                    Text(kind.shortTitle)
+                    Text(kind.title)
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
@@ -332,7 +393,7 @@ private struct ACWidgetTile: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background {
                 if intent != nil {
-                    RoundedRectangle(cornerRadius: 7).fill(BreezePilotPalette.surface)
+                    RoundedRectangle(cornerRadius: ACWidgetMetrics.buttonRadius).fill(BreezePilotPalette.surface)
                 }
             }
         if let intent {
@@ -348,14 +409,14 @@ private struct ACWidgetTile: View {
     private func stepAccessibilityLabel(_ direction: Int, kind: StepKind) -> Text {
         switch kind {
         case .temperature:
-            direction < 0 ? Text("Lower \(reading.unit.name) target temperature") : Text("Raise \(reading.unit.name) target temperature")
+            direction < 0 ? Text("Lower \(reading.unit.name) set temperature") : Text("Raise \(reading.unit.name) set temperature")
         case .fan:
             direction < 0 ? Text("Lower \(reading.unit.name) fan speed") : Text("Raise \(reading.unit.name) fan speed")
         }
     }
 
     private func temperatureValue(_ status: ACStatus) -> String? {
-        guard status.isOn, status.isTemperatureMode,
+        guard isOn(status), status.isTemperatureMode,
               let target = reading.pendingTemperature ?? status.target else { return nil }
         return "\(ACStatus.degrees(target))°C"
     }
@@ -370,8 +431,9 @@ private struct ACWidgetTile: View {
     }
 
     private func fanIntent(_ direction: Int, status: ACStatus) -> SetACWidgetFanSpeedIntent? {
-        guard status.isOn, let mode = status.mode, let fan = status.fan else { return nil }
-        let current = fan.selected.flatMap { fan.available.firstIndex(of: $0) }
+        guard isOn(status), let mode = status.mode, let fan = status.fan else { return nil }
+        // Step from the value on screen, so quick taps build on each other.
+        let current = (reading.pendingFan ?? fan.selected).flatMap { fan.available.firstIndex(of: $0) }
         let index = current.map { $0 + direction } ?? (direction > 0 ? 0 : -1)
         guard fan.available.indices.contains(index) else { return nil }
         return SetACWidgetFanSpeedIntent(unit: reading.unit, speed: fan.available[index], mode: mode)

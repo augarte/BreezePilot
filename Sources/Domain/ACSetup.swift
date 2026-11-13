@@ -1,7 +1,9 @@
 import Foundation
 
 enum ACSetupIcon: String, Codable, CaseIterable, Identifiable, Sendable {
+    // Raw values are persisted and shared with the widget, so existing cases keep their names.
     case moon, home, departure, snowflake, sun
+    case work, movie, cook, workout, reading, gaming, guests, party, evening, cozy, eco
 
     var id: Self { self }
 
@@ -12,10 +14,41 @@ enum ACSetupIcon: String, Codable, CaseIterable, Identifiable, Sendable {
         case .departure: "door.left.hand.open"
         case .snowflake: "snowflake"
         case .sun: "sun.max"
+        case .work: "laptopcomputer"
+        case .movie: "film"
+        case .cook: "fork.knife"
+        case .workout: "figure.run"
+        case .reading: "book"
+        case .gaming: "gamecontroller"
+        case .guests: "person.2"
+        case .party: "party.popper"
+        case .evening: "sunset"
+        case .cozy: "flame"
+        case .eco: "leaf"
         }
     }
 
-    var label: String { rawValue.capitalized }
+    /// What the scene is for, not what the icon looks like.
+    var label: String {
+        switch self {
+        case .moon: "Sleep"
+        case .home: "Home"
+        case .departure: "Away"
+        case .snowflake: "Cool Down"
+        case .sun: "Morning"
+        case .work: "Work"
+        case .movie: "Movie Night"
+        case .cook: "Cooking"
+        case .workout: "Workout"
+        case .reading: "Reading"
+        case .gaming: "Gaming"
+        case .guests: "Guests"
+        case .party: "Party"
+        case .evening: "Evening"
+        case .cozy: "Cozy"
+        case .eco: "Eco"
+        }
+    }
 }
 
 struct ACSetup: Codable, Equatable, Identifiable, Sendable {

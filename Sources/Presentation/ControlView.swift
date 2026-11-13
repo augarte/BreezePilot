@@ -47,17 +47,21 @@ struct ControlView: View {
 
     private func controls(_ status: ACStatus) -> some View {
         let isPoweredOff = !status.isOn
-        let isTemperatureInactive = status.isOn && !status.isTemperatureMode
         let isXiaomi = unit.xiaomi != nil
 
+        // Most used first: power and temperature, then mode, fan and the rarely touched extras.
         return ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                ACConnectionBar(status: status, viewModel: viewModel)
+            VStack(alignment: .leading, spacing: BreezeMetrics.cardSpacing) {
+                ACTemperatureCard(viewModel: viewModel, status: status, isXiaomi: isXiaomi)
+                if let message = viewModel.message {
+                    Label(message, systemImage: "info.circle")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 4)
+                        .accessibilityIdentifier("connectionMessage")
+                }
                 Group {
                     ACModePicker(viewModel: viewModel)
-                    ACTemperatureCard(viewModel: viewModel, isXiaomi: isXiaomi)
-                        .saturation(isTemperatureInactive ? 0 : 1)
-                        .opacity(isTemperatureInactive ? 0.72 : 1)
                     if !isXiaomi || status.fan != nil {
                         ACFanCard(viewModel: viewModel)
                     }
@@ -66,19 +70,11 @@ struct ControlView: View {
                     }
                 }
                 .disabled(isPoweredOff)
-                .saturation(isPoweredOff ? 0 : 1)
-                .opacity(isPoweredOff ? 0.72 : 1)
-                if let message = viewModel.message {
-                    Label(message, systemImage: "info.circle")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .accessibilityIdentifier("connectionMessage")
-                }
+                .opacity(isPoweredOff ? 0.55 : 1)
+                ACStatusLine(viewModel: viewModel)
+                    .padding(.top, 6)
             }
-            .frame(maxWidth: 520)
-            .padding(.horizontal, 20)
-            .padding(.vertical, 16)
-            .frame(maxWidth: .infinity)
+            .breezePage()
         }
         .refreshable { await viewModel.refresh() }
     }

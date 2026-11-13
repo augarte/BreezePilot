@@ -2,13 +2,13 @@ import SwiftUI
 
 struct ACListView: View {
     @Environment(\.scenePhase) private var scenePhase
-    @State private var addingUnit = false
-    @State private var showingSettings = false
     @State private var viewModel: ACListViewModel
+    @Binding var addingUnit: Bool
     let library: ACLibrary
     let devices: ACDevices
 
-    init(library: ACLibrary, devices: ACDevices) {
+    init(library: ACLibrary, devices: ACDevices, addingUnit: Binding<Bool>) {
+        _addingUnit = addingUnit
         self.library = library
         self.devices = devices
         _viewModel = State(initialValue: ACListViewModel(makeDevice: devices.make))
@@ -31,15 +31,13 @@ struct ACListView: View {
                 )
             } else {
                 ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 24) {
+                    LazyVStack(alignment: .leading, spacing: BreezeMetrics.sectionSpacing) {
                         ForEach(library.rooms) { room in
                             let units = library.units.filter { $0.roomID == room.id }
                             if !units.isEmpty { group(room.name, units: units) }
                         }
                     }
-                    .frame(maxWidth: 520)
-                    .padding(20)
-                    .frame(maxWidth: .infinity)
+                    .breezePage()
                 }
                 .refreshable { await viewModel.refresh(library.units) }
             }
@@ -47,20 +45,9 @@ struct ACListView: View {
         .background(BreezePilotPalette.canvas)
         .navigationTitle("Air Conditioners")
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button("Settings", systemImage: "gearshape") { showingSettings = true }
-                    .labelStyle(.iconOnly)
-            }
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Add AC", systemImage: "plus") { addingUnit = true }
-                    .labelStyle(.iconOnly)
+                ProfileToolbarButton(library: library).labelStyle(.iconOnly)
             }
-        }
-        .sheet(isPresented: $addingUnit) {
-            ConnectionView(unit: SavedAC(roomID: library.defaultRoom?.id), library: library, devices: devices)
-        }
-        .sheet(isPresented: $showingSettings) {
-            LibrarySettingsView(library: library)
         }
         .task(id: RefreshTrigger(units: library.units, phase: scenePhase)) {
             if scenePhase == .active { await viewModel.refresh(library.units) }
@@ -68,23 +55,32 @@ struct ACListView: View {
     }
 
     private func group(_ name: String, units: [SavedAC]) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: BreezeMetrics.cardSpacing) {
             Text(name)
-                .font(.headline)
+                .font(.title3.weight(.semibold))
+                .padding(.horizontal, 4)
                 .accessibilityAddTraits(.isHeader)
 
             ForEach(units) { unit in
+                let status = viewModel.summaries[unit.id]
+                let canPower = status?.powerWritable == true
                 NavigationLink(value: unit.id) {
-                    ACListCard(
-                        name: unit.name,
-                        status: viewModel.summaries[unit.id],
-                        loading: viewModel.loading
-                    )
+                    ACListCard(name: unit.name, status: status, loading: viewModel.loading,
+                               reservesPowerButton: canPower)
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("acListItem")
+                // The power button sits over the card, not inside the link, so each stays its own control.
+                .overlay(alignment: .topTrailing) {
+                    if let status, canPower {
+                        ACListPowerButton(name: unit.name, isOn: status.isOn,
+                                          busy: viewModel.busy.contains(unit.id)) {
+                            Task { await viewModel.togglePower(unit) }
+                        }
+                        .padding(BreezeMetrics.cardPadding)
+                    }
+                }
             }
         }
     }
-
 }

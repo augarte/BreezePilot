@@ -12,21 +12,28 @@ struct ACModePicker: View {
         let layout = dynamicTypeSize.isAccessibilitySize || modes.count > 4
             ? AnyLayout(VStackLayout(spacing: 8))
             : AnyLayout(HStackLayout(spacing: 8))
-        layout {
-            ForEach(modes, id: \.self) { mode in
-                ACOptionButton(
-                    title: mode.label,
-                    accessibilityTitle: "\(mode.label) mode",
-                    selected: status?.mode == mode,
-                    available: status?.isOn == true && status?.availableModes.contains(mode) == true,
-                    busy: viewModel.isUpdating
-                ) {
-                    Task { await viewModel.selectMode(mode) }
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Mode", systemImage: "air.conditioner.horizontal")
+                .font(.headline)
+                .accessibilityAddTraits(.isHeader)
+
+            layout {
+                ForEach(modes, id: \.self) { mode in
+                    ACOptionButton(
+                        title: mode.label,
+                        accessibilityTitle: "\(mode.label) mode",
+                        selected: status?.mode == mode,
+                        available: status?.isOn == true && status?.availableModes.contains(mode) == true,
+                        busy: viewModel.isUpdating
+                    ) {
+                        Task { await viewModel.selectMode(mode) }
+                    }
                 }
             }
+            .accessibilityElement(children: .contain)
+            .accessibilityLabel("Operating mode")
         }
-        .accessibilityElement(children: .contain)
-        .accessibilityLabel("Operating mode")
+        .breezeCard()
     }
 }
 
@@ -60,8 +67,7 @@ struct ACFanCard: View {
                 }
             }
         }
-        .padding(18)
-        .background(BreezePilotPalette.surface, in: RoundedRectangle(cornerRadius: 20))
+        .breezeCard()
     }
 
     private var displayedSpeeds: [FanSpeed] {
@@ -72,7 +78,7 @@ struct ACFanCard: View {
     }
 
     private func row(_ speeds: [FanSpeed]) -> some View {
-        HStack(spacing: 8) {
+        HStack(spacing: BreezeMetrics.controlSpacing) {
             ForEach(speeds, id: \.self) { fanButton($0) }
         }
     }
@@ -137,8 +143,7 @@ struct ACExtrasCard: View {
                 .font(.headline)
                 .foregroundStyle(.primary)
         }
-        .padding(18)
-        .background(BreezePilotPalette.surface, in: RoundedRectangle(cornerRadius: 20))
+        .breezeCard()
     }
 }
 

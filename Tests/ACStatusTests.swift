@@ -36,6 +36,28 @@ struct ACStatusTests {
         #expect(!ACFeatures(boost: true, econo: true, streamer: nil).confirms(.boost))
         #expect(!ACFeatures(boost: nil, econo: nil, streamer: nil).confirms(.off))
     }
+
+    @Test func expectingShowsTappedChangesAndKeepsTheRest() {
+        let off = ACStatus(
+            isOn: false, mode: .cool, availableModes: [.cool],
+            room: RoomConditions(temperature: 26, humidity: 55), target: 54, limits: 36...64,
+            fan: ACFan(selected: .two, available: [.one, .two, .three]),
+            features: ACFeatures(boost: nil, econo: nil, streamer: nil)
+        )
+        // The temperature buttons only work on an AC that is on, so a power tap has to count straight away.
+        #expect(off.adjusted(by: 1) == nil)
+        let turnedOn = off.expecting(power: true)
+        #expect(turnedOn.isOn)
+        #expect(turnedOn.adjusted(by: 1) == 55)
+        #expect(turnedOn.target == 54)
+        #expect(turnedOn.fan?.selected == .two)
+        #expect(turnedOn.room.temperature == 26)
+
+        let changed = off.expecting(power: true, target: 52, fan: .three)
+        #expect(changed.isOn && changed.target == 52 && changed.fan?.selected == .three)
+        #expect(changed.fan?.available == [.one, .two, .three])
+        #expect(off.expecting().isOn == false && off.expecting().target == 54)
+    }
 }
 
 func sampleStatus(

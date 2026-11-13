@@ -1,19 +1,30 @@
 import SwiftUI
 
+/// The control screen's main card: power, the set temperature and the room's readings.
 struct ACTemperatureCard: View {
     @ScaledMetric(relativeTo: .largeTitle) private var temperatureSize = 76.0
     let viewModel: ACControlViewModel
+    let status: ACStatus
     let isXiaomi: Bool
+
+    /// The temperature can't be changed while the AC is off or in a mode without a target.
+    private var dimmed: Bool { !status.isOn || !status.isTemperatureMode }
 
     var body: some View {
         VStack(spacing: 16) {
-            Label {
-                Text(isXiaomi ? "Set temperature" : "Cooling target")
-            } icon: {
-                Image(systemName: viewModel.status?.mode == .heat && isXiaomi ? "thermometer.sun" : "snowflake")
-                    .foregroundStyle(BreezePilotPalette.gold)
+            HStack(spacing: 12) {
+                Label {
+                    Text(isXiaomi ? "Set temperature" : "Cooling target")
+                } icon: {
+                    Image(systemName: status.mode == .heat && isXiaomi ? "thermometer.sun" : "snowflake")
+                        .foregroundStyle(BreezePilotPalette.gold)
+                }
+                .font(.headline)
+                .opacity(dimmed ? 0.7 : 1)
+
+                Spacer(minLength: 8)
+                powerButton
             }
-            .font(.headline)
 
             ViewThatFits(in: .horizontal) {
                 HStack(spacing: 8) {
@@ -30,21 +41,41 @@ struct ACTemperatureCard: View {
                     }
                 }
             }
+            .opacity(dimmed ? 0.6 : 1)
 
-            if let room = viewModel.status?.room, room.hasReading {
+            if status.room.hasReading {
                 Divider().overlay(.white.opacity(0.22))
-                RoomConditionsView(conditions: room)
+                RoomConditionsView(conditions: status.room)
                     .font(.subheadline)
                     .foregroundStyle(.white.opacity(0.92))
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(22)
+        .padding(20)
         .foregroundStyle(.white)
         .background {
-            RoundedRectangle(cornerRadius: 26)
+            RoundedRectangle(cornerRadius: BreezeMetrics.cardRadius)
                 .fill(BreezePilotPalette.temperatureGradient)
+                .saturation(dimmed ? 0.1 : 1)
         }
+    }
+
+    private var powerButton: some View {
+        Button {
+            Task { await viewModel.togglePower() }
+        } label: {
+            Image(systemName: "power")
+                .font(.system(size: 20, weight: .bold))
+                .frame(width: 48, height: 48)
+                .foregroundStyle(status.isOn ? BreezePilotPalette.action : Color.white)
+                .background(.white.opacity(status.isOn ? 1 : 0.22), in: Circle())
+                .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .disabled(viewModel.isUpdating || !status.powerWritable)
+        .opacity(status.powerWritable ? 1 : 0.4)
+        .accessibilityLabel(status.isOn ? "Turn Off" : "Turn On")
+        .accessibilityValue(status.isOn ? "AC is on" : "AC is off")
     }
 
     private var targetValue: some View {
@@ -68,5 +99,4 @@ struct ACTemperatureCard: View {
         .disabled(!enabled)
         .accessibilityLabel(delta > 0 ? "Raise set temperature" : "Lower set temperature")
     }
-
 }

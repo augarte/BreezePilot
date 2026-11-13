@@ -21,10 +21,10 @@ struct ACSetupWidgetConfiguration: WidgetConfigurationIntent {
     static let title: LocalizedStringResource = "AC Scenes"
     static let description = IntentDescription("Choose which scenes you can run from this widget.")
 
-    @Parameter(title: "Scene 1", query: WidgetACSetupQuery()) var first: ACSetupEntity
-    @Parameter(title: "Scene 2", query: WidgetACSetupQuery()) var second: ACSetupEntity
-    @Parameter(title: "Scene 3", query: WidgetACSetupQuery()) var third: ACSetupEntity
-    @Parameter(title: "Scene 4", query: WidgetACSetupQuery()) var fourth: ACSetupEntity
+    @Parameter(title: "Scene 1", query: WidgetACSetupQuery()) var first: ACSetupEntity?
+    @Parameter(title: "Scene 2", query: WidgetACSetupQuery()) var second: ACSetupEntity?
+    @Parameter(title: "Scene 3", query: WidgetACSetupQuery()) var third: ACSetupEntity?
+    @Parameter(title: "Scene 4", query: WidgetACSetupQuery()) var fourth: ACSetupEntity?
 
     init() {
         first = .unselected
@@ -55,7 +55,7 @@ struct ACSetupWidgetConfiguration: WidgetConfigurationIntent {
         }
         var seen = Set<UUID>()
         return slots.compactMap { slot in
-            guard slot.id != ACSetupEntity.unselected.id, seen.insert(slot.id).inserted else { return nil }
+            guard let slot, slot.id != ACSetupEntity.unselected.id, seen.insert(slot.id).inserted else { return nil }
             return catalog.first { $0.id == slot.id }
         }
     }
@@ -129,22 +129,24 @@ private struct ACSetupWidgetView: View {
     let entry: ACSetupWidgetEntry
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            Label("Scenes", systemImage: "square.stack")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(BreezePilotPalette.accent)
+        Group {
             if entry.cards.isEmpty {
-                Text(entry.hasSavedSetups ? "Choose a scene in Edit Widget." : "Create a scene in BreezePilot.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .frame(maxHeight: .infinity, alignment: .center)
-            } else if family == .systemLarge {
-                largeCards
+                ACWidgetEmptyState(
+                    symbol: "square.stack", title: "Scenes",
+                    message: entry.hasSavedSetups ? "Choose a scene in Edit Widget." : "Create a scene in BreezePilot."
+                )
             } else {
-                row(entry.cards[...])
+                VStack(alignment: .leading, spacing: ACWidgetMetrics.spacing(family)) {
+                    ACWidgetHeader(title: "Scenes", symbol: "square.stack")
+                    if family == .systemLarge {
+                        largeCards
+                    } else {
+                        row(entry.cards[...])
+                    }
+                }
+                .padding(ACWidgetMetrics.margin(family))
             }
         }
-        .padding(9)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .widgetURL(family == .systemSmall ? entry.cards.first.map { ACSetupStore.detailsURL(for: $0.id) }
                    ?? ACSetupStore.homeURL : ACSetupStore.homeURL)
@@ -165,7 +167,7 @@ private struct ACSetupWidgetView: View {
     }
 
     private func row(_ cards: ArraySlice<ACSetupWidgetEntry.Card>) -> some View {
-        HStack(spacing: 6) {
+        HStack(spacing: ACWidgetMetrics.spacing(family)) {
             ForEach(cards) { card in
                 cardView(card)
             }
@@ -173,7 +175,7 @@ private struct ACSetupWidgetView: View {
     }
 
     private func cardView(_ card: ACSetupWidgetEntry.Card, spacious: Bool = false) -> some View {
-        VStack(alignment: .leading, spacing: 3) {
+        VStack(alignment: .leading, spacing: 4) {
             if family == .systemSmall {
                 cardTitle(card.setup, spacious: spacious)
             } else {
@@ -203,15 +205,16 @@ private struct ACSetupWidgetView: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: spacious ? 44 : 34)
                     .foregroundStyle(.white)
-                    .background(BreezePilotPalette.action, in: RoundedRectangle(cornerRadius: 8))
+                    .background(BreezePilotPalette.action, in: RoundedRectangle(cornerRadius: ACWidgetMetrics.controlRadius))
                     .contentShape(Rectangle())
             }
             .buttonStyle(.borderless)
             .accessibilityLabel("Run \(card.setup.name)")
         }
-        .padding(spacious ? 12 : 7)
+        .padding(spacious ? 12 : 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(BreezePilotPalette.surface, in: RoundedRectangle(cornerRadius: 11))
+        .background(BreezePilotPalette.surface,
+                    in: RoundedRectangle(cornerRadius: spacious ? ACWidgetMetrics.tileRadius : ACWidgetMetrics.compactTileRadius))
     }
 
     private func cardTitle(_ setup: ACSetup, spacious: Bool) -> some View {

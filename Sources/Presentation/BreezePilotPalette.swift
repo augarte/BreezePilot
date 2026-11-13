@@ -26,3 +26,38 @@ enum BreezePilotPalette {
         )
     }
 }
+
+/// One set of spacing and corner values so every screen has the same rhythm.
+enum BreezeMetrics {
+    static let pageMargin: CGFloat = 20
+    static let contentWidth: CGFloat = 520
+    /// Between groups of cards, such as rooms.
+    static let sectionSpacing: CGFloat = 28
+    /// Between cards in the same group.
+    static let cardSpacing: CGFloat = 14
+    static let cardPadding: CGFloat = 18
+    static let cardRadius: CGFloat = 24
+    /// Icon tiles and panels nested inside a card.
+    static let tileRadius: CGFloat = 14
+    /// Option buttons.
+    static let controlRadius: CGFloat = 12
+    static let controlSpacing: CGFloat = 8
+    /// Icon tiles and round action buttons that lead or trail a card's title.
+    static let cardAccessory: CGFloat = 46
+}
+
+extension View {
+    func breezeCard() -> some View {
+        padding(BreezeMetrics.cardPadding)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(BreezePilotPalette.surface, in: RoundedRectangle(cornerRadius: BreezeMetrics.cardRadius))
+    }
+
+    /// Centres scrolling content at a readable width with the shared page margins.
+    func breezePage() -> some View {
+        frame(maxWidth: BreezeMetrics.contentWidth)
+            .padding(.horizontal, BreezeMetrics.pageMargin)
+            .padding(.vertical, 16)
+            .frame(maxWidth: .infinity)
+    }
+}

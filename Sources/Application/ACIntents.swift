@@ -60,7 +60,7 @@ struct SetACPowerIntent: AppIntent {
     }
 
     func perform() async throws -> some IntentResult {
-        try await ACIntentCommand.run(for: unit.id) { _ in .power(isOn) }
+        ACIntentCommand.enqueue(for: unit.id, kind: .power(isOn))
         return .result()
     }
 }
@@ -169,12 +169,12 @@ struct SetACWidgetFanSpeedIntent: AppIntent {
     }
 
     func perform() async throws -> some IntentResult {
-        try await ACIntentCommand.run(for: unit.id) { _ in
-            guard let fanSpeed = FanSpeed(rawValue: speed), let climateMode = ClimateMode(rawValue: mode) else {
-                throw ACIntentCommand.Failure(message: "That fan speed is unavailable.")
-            }
-            return .fan(fanSpeed, mode: climateMode)
+        guard let fanSpeed = FanSpeed(rawValue: speed), let climateMode = ClimateMode(rawValue: mode) else {
+            ACWidgetStore.recordFailure("That fan speed is unavailable.", for: unit.id)
+            ACWidgetStore.reload()
+            return .result()
         }
+        ACIntentCommand.enqueue(for: unit.id, kind: .fan(.init(speed: fanSpeed, mode: climateMode)))
         return .result()
     }
 }
@@ -184,8 +184,13 @@ struct RefreshACWidgetIntent: AppIntent {
     static let isDiscoverable = false
 
     func perform() async throws -> some IntentResult {
-        // WidgetKit reloads the timeline after the action, so the provider reads each selected AC again.
-        .result()
+        // Mark the widget as refreshing and return, so it redraws now. A background activity reads the
+        // ACs, clears the marker and reloads the widget when it is done.
+        ACWidgetDiagnostics.log("refresh intent refreshing=\(ACWidgetStore.pending?.isRefreshing ?? false)")
+        guard let pending = ACWidgetStore.pending, !pending.isRefreshing else { return .result() }
+        pending.beginRefresh()
+        ACWidgetPendingActivity.refresh(catalog: ACWidgetStore.catalog, pending: pending)
+        return .result()
     }
 }
 
@@ -193,6 +198,23 @@ private enum ACIntentCommand {
     struct Failure: LocalizedError {
         let message: String
         var errorDescription: String? { message }
+    }
+
+    /// Queues a widget tap and returns at once, so the widget redraws with the new value before the AC answers.
+    static func enqueue(for id: UUID, kind: ACWidgetPendingChanges.Kind) {
+        ACWidgetDiagnostics.log("enqueue \(kind) container=\(ACWidgetStore.container != nil) catalog=\(ACWidgetStore.catalog.count)")
+        guard let pending = ACWidgetStore.pending,
+              let unit = ACWidgetStore.catalog.first(where: { $0.unit.id == id })?.unit,
+              let address = LocalAddress(unit.address) else {
+            ACWidgetDiagnostics.log("enqueue guard failed")
+            ACWidgetStore.recordFailure("Choose an air conditioner saved in BreezePilot.", for: id)
+            ACWidgetStore.reload()
+            return
+        }
+        ACWidgetStore.recordFailure(nil, for: id)
+        pending.enqueue(kind, for: id)
+        ACWidgetStore.reload()
+        ACWidgetPendingActivity.schedule(unit: unit, address: address, pending: pending)
     }
 
     static func run(

@@ -6,11 +6,13 @@ struct ACEmptyStateView: View {
         let perform: () -> Void
     }
 
-    let artwork: BreezeIllustration.Artwork
+    var artwork: BreezeIllustration.Artwork?
+    /// Shown in place of artwork on screens that have no illustration.
+    var symbol: String?
     let title: LocalizedStringKey
     let message: Text
-    let primaryAction: Action
-    let primaryIcon: String
+    var primaryAction: Action?
+    var primaryIcon = "plus"
     var secondaryAction: Action?
     var titleIdentifier = "emptyStateTitle"
     var messageIdentifier = "emptyStateMessage"
@@ -25,7 +27,16 @@ struct ACEmptyStateView: View {
 
     private var content: some View {
         VStack(spacing: 20) {
-            BreezeIllustration(artwork: artwork)
+            if let artwork {
+                BreezeIllustration(artwork: artwork)
+            } else if let symbol {
+                Image(systemName: symbol)
+                    .font(.system(size: 44, weight: .medium))
+                    .foregroundStyle(BreezePilotPalette.accent)
+                    .frame(width: 96, height: 96)
+                    .background(BreezePilotPalette.ice, in: Circle())
+                    .accessibilityHidden(true)
+            }
 
             VStack(spacing: 8) {
                 Text(title)
@@ -40,15 +51,17 @@ struct ACEmptyStateView: View {
             }
 
             VStack(spacing: 4) {
-                Button(action: primaryAction.perform) {
-                    Label(primaryAction.title, systemImage: primaryIcon)
-                        .font(.body.weight(.semibold))
-                        .frame(minWidth: 160, minHeight: 28)
+                if let primaryAction {
+                    Button(action: primaryAction.perform) {
+                        Label(primaryAction.title, systemImage: primaryIcon)
+                            .font(.body.weight(.semibold))
+                            .frame(minWidth: 160, minHeight: 28)
+                    }
+                    .controlSize(.large)
+                    .buttonStyle(.borderedProminent)
+                    .buttonBorderShape(.capsule)
+                    .tint(BreezePilotPalette.action)
                 }
-                .controlSize(.large)
-                .buttonStyle(.borderedProminent)
-                .buttonBorderShape(.capsule)
-                .tint(BreezePilotPalette.action)
 
                 if let secondaryAction {
                     Button(action: secondaryAction.perform) {

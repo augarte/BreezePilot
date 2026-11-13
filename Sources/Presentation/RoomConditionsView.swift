@@ -14,7 +14,7 @@ struct RoomConditionsView: View {
     @ViewBuilder
     private var readings: some View {
         if let temperature = conditions.temperature {
-            Label("\(temperature) °C", systemImage: "thermometer.medium")
+            Label("\(temperature)°C", systemImage: "thermometer.medium")
                 .accessibilityLabel("Room temperature, \(temperature) degrees Celsius")
         }
         if let humidity = conditions.humidity {

@@ -49,7 +49,7 @@ private actor SimulatedAC: ACDevice {
     func readStatus() throws -> ACStatus {
         guard isReachable else { throw ACDeviceError.unreachable }
         return ACStatus(isOn: isOn, mode: mode, availableModes: ClimateMode.selectable,
-                        room: RoomConditions(temperature: 52, humidity: 55),
+                        room: RoomConditions(temperature: 26, humidity: 55),
                         target: target, limits: 36...60,
                         fan: ACFan(selected: speed, available: FanSpeed.daikin),
                         features: ACFeatures(boost: nil, econo: nil, streamer: nil))

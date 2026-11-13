@@ -27,6 +27,10 @@ enum ACWidgetStore {
         return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: group)
     }
 
+    static var pending: ACWidgetPendingChanges? {
+        container.map { ACWidgetPendingChanges(directory: $0) }
+    }
+
     static func controlURL(for id: UUID) -> URL {
         homeURL.appendingPathComponent(id.uuidString)
     }
@@ -65,10 +69,10 @@ enum ACWidgetStore {
         let observedAt: Date
     }
 
-    static func cachedStatus(for id: UUID) -> StatusSnapshot? {
+    static func cachedStatus(for id: UUID, maxAge: TimeInterval = 1_200) -> StatusSnapshot? {
         guard let url = statusURL(for: id), let data = try? Data(contentsOf: url),
               let snapshot = try? JSONDecoder().decode(StatusSnapshot.self, from: data),
-              Date.now.timeIntervalSince(snapshot.observedAt) < 1_200 else { return nil }
+              Date.now.timeIntervalSince(snapshot.observedAt) < maxAge else { return nil }
         return snapshot
     }
 

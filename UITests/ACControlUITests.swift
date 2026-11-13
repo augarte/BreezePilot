@@ -8,7 +8,6 @@ final class ACControlUITests: XCTestCase {
         let powerOn = app.buttons["Turn On"]
         let raiseTemperature = app.buttons["Raise set temperature"]
         let target = app.staticTexts["coolingTarget"]
-        let refresh = app.buttons["Refresh"]
 
         XCTAssertTrue(powerOff.waitForExistence(timeout: 8))
         XCTAssertEqual(target.label, "24 degrees Celsius")
@@ -19,9 +18,9 @@ final class ACControlUITests: XCTestCase {
         XCTAssertTrue(powerOff.waitForExistence(timeout: 8))
 
         raiseTemperature.tap()
-        XCTAssertTrue(refresh.wait(for: \.isEnabled, toEqual: true, timeout: 8))
-        refresh.tap()
-        XCTAssertTrue(refresh.wait(for: \.isEnabled, toEqual: true, timeout: 8))
+        // Power is disabled while the temperature change is queued or being applied.
+        XCTAssertTrue(powerOff.wait(for: \.isEnabled, toEqual: false, timeout: 8))
+        XCTAssertTrue(powerOff.wait(for: \.isEnabled, toEqual: true, timeout: 8))
         XCTAssertEqual(target.label, "24.5 degrees Celsius")
 
         let fanTwo = app.buttons["Fan speed 2"]

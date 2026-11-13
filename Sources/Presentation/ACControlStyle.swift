@@ -18,7 +18,7 @@ struct ACTemperatureStepIcon: View {
 struct ACOptionAppearance: ViewModifier {
     let selected: Bool
     let available: Bool
-    var cornerRadius: CGFloat = 12
+    var cornerRadius: CGFloat = BreezeMetrics.controlRadius
 
     func body(content: Content) -> some View {
         content
